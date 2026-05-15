@@ -50,8 +50,7 @@ class StudentRegistration
 
     public ?string $guardian_address = null;
 
-    public bool $is_re_registered = false;
-
+    public int $is_re_registered = 0;
     public ?string $created_at = null;
 
     public ?string $deleted_at = null;

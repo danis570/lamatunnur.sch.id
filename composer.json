@@ -13,5 +13,8 @@
             "email": "ahmad56danish@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "dompdf/dompdf": "*",
+        "phpoffice/phpspreadsheet": "^5.7"
+    }
 }

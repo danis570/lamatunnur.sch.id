@@ -11,62 +11,206 @@
 </p>
 
 <br>
-<br>
 
-<table border="1" cellpadding="10">
+<form id="bulkForm" method="POST">
 
-    <tr>
-        <th>ID</th>
-        <th>Name</th>
-        <th>Status</th>
+    <?php if ($model['user']->role == 'ADMIN') { ?>
 
-        <?php if ($model['user']->role == 'ADMIN') { ?>
-            <th>Action</th>
-        <?php } ?>
-    </tr>
+        <div style="margin-bottom: 15px; display:flex; gap:10px;">
 
-    <?php foreach ($model['students'] as $student) { ?>
+            <button type="submit" formaction="/students/accept-multiple">
+                Accept Selected
+            </button>
+
+            <button type="submit" formaction="/students/delete-multiple"
+                onclick="return confirm('Yakin hapus data terpilih?')">
+
+                Delete Selected
+
+            </button>
+
+            <button type="submit" formaction="/students/export/pdf-multiple">
+                Export PDF
+            </button>
+
+            <button type="submit" formaction="/students/export/excel-multiple">
+                Export Excel
+            </button>
+
+        </div>
+
+    <?php } ?>
+
+    <table border="1" cellpadding="10" width="100%" style="border-collapse: collapse;">
 
         <tr>
-            <td><?= $student->id ?></td>
-            <td><?= $student->full_name ?></td>
-            <td>
-                <?= $student->is_re_registered ?>
-            </td>
 
             <?php if ($model['user']->role == 'ADMIN') { ?>
-                <td>
-                    <a href="/students/edit/<?= $student->id ?>">
-                        Edit
-                    </a>
+                <th>
+                    <input type="checkbox" id="checkAll">
+                </th>
+            <?php } ?>
 
-                    <form action="/students/delete" method="post" style="display:inline;">
-                        <input type="hidden" name="id" value="<?= $student->id ?>">
+            <th>No</th>
+            <th>Nama</th>
+            <th>Status</th>
 
-                        <button type="submit">
-                            Delete
-                        </button>
-                    </form>
-                </td>
+            <?php if ($model['user']->role == 'ADMIN') { ?>
+                <th>Menu</th>
             <?php } ?>
 
         </tr>
 
-    <?php } ?>
+        <?php $no = 1; ?>
 
-</table>
+        <?php foreach ($model['students'] as $student) { ?>
+
+            <tr>
+
+                <?php if ($model['user']->role == 'ADMIN') { ?>
+
+                    <td>
+                        <input type="checkbox" name="student_ids[]" value="<?= $student->id ?>">
+                    </td>
+
+                <?php } ?>
+
+                <td><?= $no++ ?></td>
+
+                <td>
+                    <?= htmlspecialchars($student->full_name) ?>
+                </td>
+
+                <td>
+
+                    <?php if ($student->is_re_registered) { ?>
+
+                        <span style="color:green;">
+                            Sudah Daftar Ulang
+                        </span>
+
+                    <?php } else { ?>
+
+                        <span style="color:red;">
+                            Belum Daftar Ulang
+                        </span>
+
+                    <?php } ?>
+
+                </td>
+
+                <?php if ($model['user']->role == 'ADMIN') { ?>
+
+                    <td style="position:relative;">
+
+                        <button type="button" onclick="toggleMenu(<?= $student->id ?>)">
+                            ⋮
+                        </button>
+
+                        <div id="menu-<?= $student->id ?>" class="dropdown-menu" style="
+                                display:none;
+                                position:absolute;
+                                background:white;
+                                border:1px solid #ccc;
+                                padding:10px;
+                                z-index:10;
+                            ">
+
+                            <a href="/students/show/<?= $student->id ?>">
+                                Lihat Data
+                            </a>
+
+                            <br><br>
+
+                            <a href="/students/edit/<?= $student->id ?>">
+                                Edit
+                            </a>
+
+                            <br><br>
+
+                            <button type="submit" formaction="/students/delete" formmethod="post" name="id"
+                                value="<?= $student->id ?>">
+
+                                Delete
+
+                            </button>
+
+                            <br>
+
+                        </div>
+
+                    </td>
+
+                <?php } ?>
+
+            </tr>
+
+        <?php } ?>
+
+    </table>
+
+</form>
 
 <br>
-<br>
-
-<?php if ($model['user']->role == 'ADMIN') { ?>
-
-    <a href="/students/export/pdf">Export PDF</a>
-
-    <a href="/students/export/excel">Export Excel</a>
-
-<?php } ?>
 
 <form action="/users/logout" method="post">
     <button type="submit">Logout</button>
 </form>
+
+<script>
+
+    // CHECK ALL
+
+    document.getElementById('checkAll')
+        ?.addEventListener('change', function () {
+
+            const checkboxes =
+                document.querySelectorAll('input[name="student_ids[]"]');
+
+            checkboxes.forEach(cb => {
+                cb.checked = this.checked;
+            });
+
+        });
+
+    // DROPDOWN MENU
+
+    function toggleMenu(id) {
+
+        const menu =
+            document.getElementById('menu-' + id);
+
+        const allMenus =
+            document.querySelectorAll('.dropdown-menu');
+
+        allMenus.forEach(item => {
+
+            if (item !== menu) {
+                item.style.display = 'none';
+            }
+
+        });
+
+        menu.style.display =
+            menu.style.display === 'block'
+                ? 'none'
+                : 'block';
+    }
+
+    // CLOSE MENU WHEN CLICK OUTSIDE
+
+    window.addEventListener('click', function (e) {
+
+        if (!e.target.matches('button')) {
+
+            document
+                .querySelectorAll('.dropdown-menu')
+                .forEach(menu => {
+                    menu.style.display = 'none';
+                });
+
+        }
+
+    });
+
+</script>

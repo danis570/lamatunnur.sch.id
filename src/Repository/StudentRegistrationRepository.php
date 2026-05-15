@@ -137,6 +137,34 @@ class StudentRegistrationRepository
         return $student;
     }
 
+    public function updateReRegistrationStatus($id, $status)
+    {
+        $statement = $this->connection->prepare("
+        UPDATE student_registration
+        SET is_re_registered = ?
+        WHERE id = ?
+    ");
+
+        $statement->execute([$status, $id]);
+    }
+
+    public function acceptMultiple(array $ids)
+    {
+        if (empty($ids))
+            return;
+
+        $in = str_repeat('?,', count($ids) - 1) . '?';
+
+        $sql = "
+        UPDATE student_registration
+        SET is_re_registered = 1
+        WHERE id IN ($in)
+    ";
+
+        $stmt = $this->connection->prepare($sql);
+        $stmt->execute($ids);
+    }
+
     public function findById(int $id): ?StudentRegistration
     {
         $statement = $this->connection->prepare("

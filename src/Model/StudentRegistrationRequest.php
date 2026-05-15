@@ -48,5 +48,5 @@ class StudentRegistrationRequest
 
     public ?string $guardian_address = null;
 
-    public bool $is_re_registered = false;
+    public int $is_re_registered = 0;
 }

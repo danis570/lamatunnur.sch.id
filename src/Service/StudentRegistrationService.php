@@ -62,7 +62,7 @@ class StudentRegistrationService
             $student->guardian_job = $request->guardian_job;
             $student->guardian_address = $request->guardian_address;
 
-            $student->is_re_registered = isset($request->is_re_registered) ? 1 : 0;
+            $student->is_re_registered = $request->is_re_registered;
 
             $this->studentRegistrationRepository->save($student);
 
@@ -114,12 +114,30 @@ class StudentRegistrationService
 
     public function deleteById(int $id): void
     {
-        $student = $this->studentRegistrationRepository
-            ->findById($id);
+        $student =
+            $this->studentRegistrationRepository
+                ->findById($id);
 
         if ($student == null) {
             throw new ValidationException("Student not found");
         }
+
+        // HAPUS FOTO
+
+        if (!empty($student->img)) {
+
+            $photoPath =
+                __DIR__ .
+                '/../../public/uploads/photos/students-registration/' .
+                $student->img;
+
+            if (file_exists($photoPath)) {
+
+                unlink($photoPath);
+            }
+        }
+
+        // HAPUS DATABASE
 
         $this->studentRegistrationRepository
             ->deleteById($id);

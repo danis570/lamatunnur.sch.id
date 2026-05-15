@@ -29,26 +29,61 @@ Router::add(
     'GET',
     '/students/edit/([0-9]+)',
     StudentController::class,
-    'edit');
+    'edit'
+);
+Router::add(
+    'GET',
+    '/students/show/([0-9]+)',
+    StudentController::class,
+    'show'
+);
 Router::add(
     'POST',
     '/students/update',
     StudentController::class,
-    'update');
+    'update'
+);
 Router::add(
     'POST',
     '/students/delete',
     StudentController::class,
-    'delete');
-
-// user role user controller
+    'delete'
+);
+Router::add(
+    'POST',
+    '/students/delete-multiple',
+    StudentController::class,
+    'deleteMultiple'
+);
 Router::add(
     "GET",
-    "/students",
+    "/students/export/pdf/([0-9]+)",
     StudentController::class,
-    "index",
+    "exportPdf",
     [MustLoginMiddleware::class]
 );
+Router::add(
+    "POST",
+    "/students/export/pdf-multiple",
+    StudentController::class,
+    "exportPdfMultiple"
+);
+Router::add(
+    "POST",
+    "/students/export/excel-multiple",
+    StudentController::class,
+    "exportExcelMultiple",
+    [MustLoginMiddleware::class]
+);
+Router::add(
+    "POST",
+    "/students/accept-multiple",
+    StudentController::class,
+    "acceptMultiple",
+    [MustAdminMiddleware::class]
+);
+
+// user role user controller
 
 // student controller
 Router::add("GET", "/students/registration", StudentController::class, "registration", []);
