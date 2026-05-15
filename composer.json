@@ -1,0 +1,17 @@
+{
+    "name": "danish/lamatunnur.sch.id",
+    "description": "Website Madrasah Diniyah Takmiliyah Awaliyah",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Danish\\LamatunnurSchId\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Ahmad Danish",
+            "email": "ahmad56danish@gmail.com"
+        }
+    ],
+    "require": {}
+}
