@@ -20,22 +20,15 @@
 <body>
     <script src="/assets/static/js/initTheme.js"></script>
 
-
-
     <div>
-        <header class="mb-3">
-            <a href="#" class="burger-btn d-block d-xl-none">
-                <i class="bi bi-justify fs-3"></i>
-            </a>
-        </header>
 
         <div class="container mt-4">
             <div class="row justify-content-center">
                 <div class="col-lg-8 col-md-10">
                     <div class="page-heading">
                         <div class="page-title text-center mb-4">
-                            <h3>Registrasi Santri Baru</h3>
-                            <p class="text-subtitle text-muted">Isi data pendaftaran santri baru dengan lengkap</p>
+                            <h3>Registrasi Santri Baru 2026</h3>
+                            <p class="text-subtitle text-muted">Isi data pendaftaran santri baru dengan lengkap dan mari jadi bagian dari kami</p>
                         </div>
 
                         <section class="section">
@@ -110,7 +103,7 @@
                                                             style="display: none;">
                                                     </div>
                                                     <small class="text-muted d-block mt-2">Format: JPG, PNG
-                                                        (Opsional)</small>
+                                                        (3x4)</small>
                                                 </div>
                                             </div>
 
@@ -171,10 +164,7 @@
                                                     <select name="religion" class="form-select" required>
                                                         <option value="">Pilih</option>
                                                         <option value="Islam" <?= ($model['formData']['religion'] ?? '') == 'Islam' ? 'selected' : '' ?>>Islam</option>
-                                                        <option value="Kristen" <?= ($model['formData']['religion'] ?? '') == 'Kristen' ? 'selected' : '' ?>>Kristen</option>
-                                                        <option value="Katolik" <?= ($model['formData']['religion'] ?? '') == 'Katolik' ? 'selected' : '' ?>>Katolik</option>
-                                                        <option value="Hindu" <?= ($model['formData']['religion'] ?? '') == 'Hindu' ? 'selected' : '' ?>>Hindu</option>
-                                                        <option value="Buddha" <?= ($model['formData']['religion'] ?? '') == 'Buddha' ? 'selected' : '' ?>>Buddha</option>
+                                                        
                                                     </select>
                                                 </div>
                                                 <div class="col-md-4 mb-3">
@@ -258,8 +248,8 @@
 
                                             <hr class="my-4">
 
-                                            <h6 class="mb-3"><i class="bi bi-person-plus-fill text-warning"></i>
-                                                Data Wali (Opsional)</h6>
+                                            <h6 class="mb-3">
+                                                Data Wali (Wajib)</h6>
 
                                             <div class="row">
                                                 <div class="col-md-6 mb-3">
@@ -285,14 +275,14 @@
                                         <div class="d-flex justify-content-between mt-4">
                                             <button type="button" id="prevBtn" class="btn btn-secondary px-4"
                                                 style="display: none;">
-                                                <i class="bi bi-arrow-left"></i> Sebelumnya
+                                                <i class="bi bi-arrow-left"></i>
                                             </button>
                                             <button type="button" id="nextBtn" class="btn btn-primary px-4 ms-auto">
-                                                Selanjutnya <i class="bi bi-arrow-right"></i>
+                                                <i class="bi bi-arrow-right"></i>
                                             </button>
                                             <button type="submit" id="submitBtn" class="btn btn-success px-4"
                                                 style="display: none;">
-                                                <i class="bi bi-check-circle"></i> Simpan & Selesai
+                                                Simpan & Selesai
                                             </button>
                                         </div>
                                     </form>
@@ -300,7 +290,7 @@
                                     <div class="text-center mt-4">
                                         <button type="button" class="btn btn-link text-danger small p-0" id="cancelBtn"
                                             style="text-decoration: none;">
-                                            <i class="bi bi-x-circle"></i> Batalkan Pendaftaran
+                                            Batalkan Pendaftaran
                                         </button>
                                     </div>
                                 </div>
@@ -448,10 +438,9 @@
             const modalBody = document.getElementById('confirmModalBody');
             const modalBtn = document.getElementById('confirmModalBtn');
 
-            modalTitle.innerHTML = '<i class="bi bi-exclamation-triangle text-danger"></i> Validasi Gagal';
+            modalTitle.innerHTML = 'Validasi Gagal';
             modalBody.innerHTML = message;
             modalBtn.className = 'btn btn-danger ms-1';
-            modalBtn.innerHTML = '<i class="bi bi-x-circle"></i> Tutup';
 
             const newBtn = modalBtn.cloneNode(true);
             modalBtn.parentNode.replaceChild(newBtn, modalBtn);
@@ -471,7 +460,7 @@
             const modalBody = document.getElementById('confirmModalBody');
             const modalBtn = document.getElementById('confirmModalBtn');
 
-            modalTitle.innerHTML = '<i class="bi bi-question-circle text-warning"></i> Konfirmasi';
+            modalTitle.innerHTML = 'Konfirmasi';
             modalBody.innerHTML = message;
             modalBtn.className = 'btn btn-success ms-1';
             modalBtn.innerHTML = '<i class="bi bi-check-circle"></i> Ya, Simpan';
@@ -642,7 +631,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="cancelModalTitle">
-                        <i class="bi bi-exclamation-triangle text-warning"></i> Batalkan Pendaftaran
+                        Batalkan Pendaftaran
                     </h5>
                     <button type="button" class="close rounded-pill" data-bs-dismiss="modal" aria-label="Close">
                         <i data-feather="x"></i>
@@ -681,9 +670,6 @@
                     Apakah Anda yakin?
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-light-secondary" data-bs-dismiss="modal">
-                        <i class="bi bi-x-circle"></i> Batal
-                    </button>
                     <button type="button" class="btn btn-primary ms-1" id="confirmModalBtn">
                         <i class="bi bi-check-circle"></i> Ya, Lanjutkan
                     </button>

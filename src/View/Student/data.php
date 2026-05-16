@@ -59,16 +59,15 @@
                 <section class="section">
                     <div class="card">
                         <div class="card-header">
-                            <h5 class="card-title">
-                                Table Student
-                            </h5>
+                            <h5 class="card-title">Table Student</h5>
                         </div>
                         <div class="card-body">
 
-                            <!-- Bulk Actions - HANYA UNTUK ADMIN -->
+                            <!-- Bulk Actions - HANYA UNTUK ADMIN (Ditambahkan id="bulkActionCard" dan d-none) -->
                             <?php if ($userRole === 'ADMIN'): ?>
-                                <div class="card mb-3">
-                                    <div class="card-body py-3">
+                                <!-- Ganti d-none menjadi kelas fade bawaan bootstrap/mazer -->
+                                <div class="card mb-3 fade" id="bulkActionCard" style="display: none;">
+                                    <div class="card-body py-3 bg-light-secondary rounded">
                                         <div class="d-flex gap-2 flex-wrap">
                                             <button type="button" id="btnAcceptSelected" class="btn btn-sm btn-success">
                                                 <i class="bi bi-check2-circle"></i> Accept Selected
@@ -133,7 +132,6 @@
                                                         ⋮
                                                     </button>
                                                     <ul class="dropdown-menu dropdown-menu-end">
-                                                        <!-- Menu Lihat Data - SEMUA ROLE BISA -->
                                                         <li>
                                                             <a class="dropdown-item"
                                                                 href="/students/show/<?= $student->id ?>">
@@ -141,7 +139,6 @@
                                                             </a>
                                                         </li>
 
-                                                        <!-- Menu Edit - HANYA ADMIN -->
                                                         <?php if ($userRole === 'ADMIN'): ?>
                                                             <li>
                                                                 <a class="dropdown-item"
@@ -151,7 +148,6 @@
                                                             </li>
                                                         <?php endif; ?>
 
-                                                        <!-- Menu Delete - HANYA ADMIN -->
                                                         <?php if ($userRole === 'ADMIN'): ?>
                                                             <li>
                                                                 <hr class="dropdown-divider">
@@ -169,15 +165,12 @@
                                                     </ul>
                                                 </td>
 
-                                                <!-- Checkbox row - HANYA ADMIN -->
+                                                <!-- Perbaikan baris kode yang terpotong di paling bawah -->
                                                 <?php if ($userRole === 'ADMIN'): ?>
                                                     <td class="text-center align-middle">
-                                                        <input type="checkbox" name="student_ids[]" value="<?= $student->id ?>"
-                                                            class="row-check" style="cursor: pointer;">
+                                                        <input type="checkbox" class="row-checkbox" value="<?= $student->id ?>"
+                                                            style="cursor: pointer;">
                                                     </td>
-                                                <?php else: ?>
-                                                    <!-- Untuk user biasa, tambahkan kolom kosong agar tabel tetap rapi -->
-                                                    <td class="text-center align-middle"></td>
                                                 <?php endif; ?>
                                             </tr>
                                         <?php endforeach; ?>
@@ -186,12 +179,73 @@
                             </form>
                         </div>
                     </div>
+
                 </section>
             </div>
 
             <!-- Script - HANYA JALANKAN UNTUK ADMIN -->
             <?php if ($userRole === 'ADMIN'): ?>
                 <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const checkAll = document.getElementById('checkAll');
+                        const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+                        const bulkActionCard = document.getElementById('bulkActionCard');
+                        const selectedIdsInput = document.getElementById('selectedIds');
+
+                        if (!bulkActionCard) return;
+
+                        // Fungsi update array ID terpilih dan kelola visibilitas card menu
+                        function updateSelectedIds() {
+                            const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
+                            const ids = Array.from(checkedBoxes).map(cb => cb.value);
+
+                            selectedIdsInput.value = ids.join(',');
+
+                            if (ids.length > 0) {
+                                // JIKA ADA YANG DICENTANG:
+                                if (bulkActionCard.style.display === 'none') {
+                                    bulkActionCard.style.display = 'block'; // Pasang display dulu
+                                    // Berikan jeda 10ms menggunakan setTimeout agar efek CSS 'fade' Bootstrap bisa nge-trigger animasi smooth
+                                    setTimeout(() => {
+                                        bulkActionCard.classList.add('show'); // Tambah class show bawaan Mazer/Bootstrap
+                                    }, 10);
+                                }
+                            } else {
+                                // JIKA KOSONG / BERSIH:
+                                bulkActionCard.classList.remove('show'); // Hapus class show (efek memudar ke transparan)
+
+                                // Tunggu animasi pudar selesai (300ms sesuai durasi default Bootstrap), lalu sembunyikan display-nya
+                                setTimeout(() => {
+                                    if (!bulkActionCard.classList.contains('show')) {
+                                        bulkActionCard.style.display = 'none';
+                                    }
+                                }, 300);
+                            }
+                        }
+
+
+                        // Event master Check All
+                        if (checkAll) {
+                            checkAll.addEventListener('change', function () {
+                                rowCheckboxes.forEach(cb => cb.checked = checkAll.checked);
+                                updateSelectedIds();
+                            });
+                        }
+
+                        // Event sub-checkbox tiap baris data
+                        rowCheckboxes.forEach(cb => {
+                            cb.addEventListener('change', function () {
+                                if (!cb.checked && checkAll) checkAll.checked = false;
+
+                                const allChecked = document.querySelectorAll('.row-checkbox:checked').length === rowCheckboxes.length;
+                                if (allChecked && checkAll) checkAll.checked = true;
+
+                                updateSelectedIds();
+                            });
+                        });
+                    });
+
+
                     document.addEventListener("DOMContentLoaded", function () {
                         // ==========================================
                         // CHECKBOX LOGIC (Select All)

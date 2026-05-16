@@ -2,8 +2,16 @@
     <div class="sidebar-wrapper active">
         <div class="sidebar-header position-relative">
             <div class="d-flex justify-content-between align-items-center">
-                <div class="logo">
-                    <a href="/"><img src="/assets/images/logo.png" alt="Logo" style="width:50px; height:auto;"></a>
+                <div class="logo d-flex align-items-center gap-2">
+                    <a href="/">
+                        <img src="/assets/images/logo.png" alt="Logo" style="width:50px; height:auto;">
+                    </a>
+
+                    <!-- Teks LAM'ATTUN NUR di kanan logo -->
+                    <span class="fw-bold tracking-wide"
+                        style="color: #6c757d; font-size: 1rem; font-family: 'Arial Black', sans-serif; letter-spacing: 1px;">
+                        L NUR
+                    </span>
                 </div>
                 <div class="theme-toggle d-flex gap-2  align-items-center mt-2">
                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
