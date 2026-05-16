@@ -58,36 +58,64 @@ class UserController
         ]);
     }
 
-    public function postLogin()
-    {
-        $request = new UserLoginRequest();
+public function postLogin()
+{
+    $request = new UserLoginRequest();
+    $request->email = $_POST['email'];
+    $request->password = $_POST['password'];
 
-        $request->email = $_POST['email'];
-        $request->password = $_POST['password'];
-
-        try {
-
-            $response = $this->userService->login($request);
-
-            $this->sessionService->create($response->user->id);
-
-            View::redirect('/');
-
-        } catch (ValidationException $exception) {
-
-            View::render('User/login', [
-                'title' => 'Login User',
-                'error' => $exception->getMessage()
-            ]);
-
+    try {
+        $response = $this->userService->login($request);
+        
+        // Hapus session lama jika ada
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
         }
+        
+        // Regenerate session ID untuk keamanan
+        session_regenerate_id(true);
+        
+        // SIMPAN ROLE KE SESSION - INI YANG PALING PENTING
+        $_SESSION['user'] = [
+            'id' => $response->user->id,
+            'name' => $response->user->name,
+            'email' => $response->user->email,
+            'role' => $response->user->role  // Pastikan ini 'admin' atau 'user'
+        ];
+        
+        // Buat juga session via service jika diperlukan
+        $this->sessionService->create($response->user->id);
+        
+        // DEBUG - Cek apakah role tersimpan
+        error_log("=== LOGIN DEBUG ===");
+        error_log("User ID: " . $response->user->id);
+        error_log("User Name: " . $response->user->name);
+        error_log("User Role: " . $response->user->role);
+        error_log("Session: " . print_r($_SESSION, true));
+        
+        // Redirect ke halaman data
+        View::redirect('/students/data');
+
+    } catch (ValidationException $exception) {
+        View::render('User/login', [
+            'title' => 'Login User',
+            'error' => $exception->getMessage()
+        ]);
     }
+}
 
     public function logout()
-    {
-        $this->sessionService->destroy();
-
-        View::redirect("/");
+{
+    // Hapus session
+    $this->sessionService->destroy();
+    
+    // Pastikan session benar-benar terhapus
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
     }
+    session_destroy();
+    
+    View::redirect("/");
+}
 
 }

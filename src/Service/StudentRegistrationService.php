@@ -91,7 +91,8 @@ class StudentRegistrationService
             $request->address == null ||
             $request->gender == null ||
             $request->religion == null ||
-            $request->parent_phone == null ||
+            // HAPUS parent_phone dari validasi wajib
+            // $request->parent_phone == null ||
 
             trim($request->full_name) == "" ||
             trim($request->birth_place) == "" ||
@@ -99,8 +100,8 @@ class StudentRegistrationService
             trim($request->student_nik) == "" ||
             trim($request->address) == "" ||
             trim($request->gender) == "" ||
-            trim($request->religion) == "" ||
-            trim($request->parent_phone) == ""
+            trim($request->religion) == ""
+            // trim($request->parent_phone) == ""
         ) {
             throw new ValidationException("Required fields can not blank");
         }
@@ -151,21 +152,7 @@ class StudentRegistrationService
             throw new ValidationException("Student not found");
         }
 
-        if (isset($_FILES['img']) && $_FILES['img']['error'] === UPLOAD_ERR_OK) {
-            // KODE INI BERJALAN JIKA USER MEMILIH FOTO BARU (error == 0)
-            if (!empty($student->img)) {
-                $oldFilePath = __DIR__ . '/../../public/uploads/photos/students-registration/' . $student->img;
-                if (file_exists($oldFilePath)) {
-                    unlink($oldFilePath); // Hapus foto lama agar hemat ruang
-                }
-            }
-            // Upload foto baru ke folder server
-            $student->img = $this->fileUploadService->uploadStudentPhoto($_FILES['img']);
-        } else {
-            // KODE INI BERJALAN JIKA USER BERHASIL UPDATE TAPI TIDAK MEMILIH FOTO BARU (error == 4)
-            // Pertahankan nama file foto lama yang sudah ada di database
-            $student->img = $student->img;
-        }
+        $student->img = $request->img;
         $student->full_name = $request->full_name;
         $student->birth_place = $request->birth_place;
         $student->birth_date = $request->birth_date;
@@ -200,6 +187,12 @@ class StudentRegistrationService
 
         $this->studentRegistrationRepository
             ->update($student);
+    }
+
+    public function findAll(): array
+    {
+        // Fungsi ini langsung memanggil findAll() milik Repository yang tadi sudah kita cek
+        return $this->studentRegistrationRepository->findAll();
     }
 
 }

@@ -21,18 +21,250 @@ class StudentController
 
     public function __construct()
     {
-        $connection = Database::getConnection();
+        $connection = Database::getConnection('prod');
         $studentRegistrationRepository = new StudentRegistrationRepository($connection);
-
-        // 2. ISI NILAI AWAL / INITIALIZE PROPERTI DI SINI
         $this->fileUploadService = new FileUploadService();
-
-        // 3. Masukkan ke service
         $this->studentRegistrationService = new StudentRegistrationService(
             $studentRegistrationRepository,
             $this->fileUploadService
         );
+
+        // Start session untuk multi-step
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
     }
+
+    // Multi-step registration form
+    public function registrationMultiStep()
+    {
+        $currentStep = (int) ($_GET['step'] ?? 1);
+
+        // Validasi step
+        if ($currentStep < 1 || $currentStep > 3) {
+            $currentStep = 1;
+        }
+
+        // Ambil data dari session jika ada
+        $formData = $_SESSION['registration_form_data'] ?? [];
+        $error = $_SESSION['registration_error'] ?? null;
+
+        // Clear error setelah ditampilkan
+        unset($_SESSION['registration_error']);
+
+        View::render('Student/registration_multi', [
+            'title' => 'Multi Step Registration',
+            'currentStep' => $currentStep,
+            'formData' => $formData,
+            'error' => $error
+        ]);
+    }
+
+    // Process each step
+    public function postRegistrationStep()
+    {
+        // Debug
+        error_log("=== postRegistrationStep CALLED ===");
+        error_log("Step: " . ($_POST['step'] ?? 'not set'));
+        error_log("POST data: " . print_r($_POST, true));
+
+        $step = (int) ($_POST['step'] ?? 1);
+
+        // Initialize session data
+        if (!isset($_SESSION['registration_form_data'])) {
+            $_SESSION['registration_form_data'] = [];
+        }
+
+        // Save data to session FIRST (sebelum validasi)
+        $this->saveStepData($step, $_POST, $_FILES);
+
+        // Debug: cek session setelah save
+        error_log("Session after save: " . print_r($_SESSION['registration_form_data'], true));
+
+        // Validate current step (setelah data disimpan)
+        $validationError = $this->validateStep($step, $_POST, $_FILES);
+
+        if ($validationError) {
+            error_log("Validation error: " . $validationError);
+            $_SESSION['registration_error'] = $validationError;
+            header("Location: /students/registration-multi?step=" . $step);
+            exit;
+        }
+
+        // Move to next step or process final
+        if ($step == 3) {
+            error_log("Step 3 - Processing final registration");
+            $this->processFinalRegistration();
+        } else {
+            $nextStep = $step + 1;
+            error_log("Moving to step: " . $nextStep);
+            header("Location: /students/registration-multi?step=" . $nextStep);
+            exit;
+        }
+    }
+
+    private function validateStep(int $step, array $postData, array $files): ?string
+    {
+        switch ($step) {
+            case 1:
+                if (empty(trim($postData['full_name'] ?? ''))) {
+                    return "Nama lengkap wajib diisi";
+                }
+                if (empty(trim($postData['student_nik'] ?? ''))) {
+                    return "NIK wajib diisi";
+                }
+                if (empty(trim($postData['birth_place'] ?? ''))) {
+                    return "Tempat lahir wajib diisi";
+                }
+                if (empty($postData['birth_date'] ?? '')) {
+                    return "Tanggal lahir wajib diisi";
+                }
+                if (empty(trim($postData['address'] ?? ''))) {
+                    return "Alamat wajib diisi";
+                }
+                if (empty(trim($postData['gender'] ?? ''))) {
+                    return "Jenis kelamin wajib dipilih";
+                }
+                if (empty(trim($postData['religion'] ?? ''))) {
+                    return "Agama wajib diisi";
+                }
+                // parent_phone TIDAK WAJIB - comment atau hapus
+                // if (empty(trim($postData['parent_phone'] ?? ''))) {
+                //     return "No HP Orang Tua wajib diisi";
+                // }
+                break;
+            case 2:
+                // Data sekolah opsional, bisa kosong
+                break;
+            case 3:
+                // Data orang tua opsional, bisa kosong
+                break;
+        }
+        return null;
+    }
+
+    private function saveStepData(int $step, array $postData, array $files)
+    {
+        $stepFields = [
+            1 => [
+                'full_name',
+                'birth_place',
+                'birth_date',
+                'student_nik',
+                'address',
+                'gender',
+                'child_order',
+                'total_siblings',
+                'religion',
+                'parent_phone'
+            ],
+            2 => ['school_name', 'school_class', 'school_address'],
+            3 => [
+                'father_name',
+                'father_job',
+                'mother_name',
+                'mother_job',
+                'parent_address',
+                'guardian_name',
+                'guardian_job',
+                'guardian_address'
+            ]
+        ];
+
+        $fields = $stepFields[$step] ?? [];
+
+        foreach ($fields as $field) {
+            if (isset($postData[$field])) {
+                $_SESSION['registration_form_data'][$field] = $postData[$field];
+                error_log("Saved field {$field} = {$postData[$field]}");
+            }
+        }
+
+        // Handle file upload di step 1
+        if ($step == 1 && isset($files['img']) && $files['img']['error'] === UPLOAD_ERR_OK) {
+            try {
+                $uploadedFile = $this->fileUploadService->uploadStudentPhoto($files['img']);
+                if ($uploadedFile) {
+                    $_SESSION['registration_form_data']['img'] = $uploadedFile;
+                    error_log("Uploaded file: " . $uploadedFile);
+                }
+            } catch (\Exception $e) {
+                error_log("Upload error: " . $e->getMessage());
+                $_SESSION['registration_error'] = $e->getMessage();
+            }
+        }
+    }
+
+    private function processFinalRegistration()
+    {
+        error_log("=== processFinalRegistration CALLED ===");
+
+        $data = $_SESSION['registration_form_data'] ?? [];
+        error_log("Final session data: " . print_r($data, true));
+
+        $request = new StudentRegistrationRequest();
+
+        // Set all properties
+        $request->img = $data['img'] ?? null;
+        $request->full_name = $data['full_name'] ?? '';
+        $request->birth_place = $data['birth_place'] ?? '';
+        $request->birth_date = $data['birth_date'] ?? '';
+        $request->student_nik = $data['student_nik'] ?? '';
+        $request->address = $data['address'] ?? '';
+        $request->gender = $data['gender'] ?? '';
+        $request->child_order = (int) ($data['child_order'] ?? 0);
+        $request->total_siblings = (int) ($data['total_siblings'] ?? 0);
+        $request->religion = $data['religion'] ?? '';
+        $request->parent_phone = $data['parent_phone'] ?? '';
+        $request->school_name = $data['school_name'] ?? null;
+        $request->school_class = $data['school_class'] ?? null;
+        $request->school_address = $data['school_address'] ?? null;
+        $request->father_name = $data['father_name'] ?? null;
+        $request->father_job = $data['father_job'] ?? null;
+        $request->mother_name = $data['mother_name'] ?? null;
+        $request->mother_job = $data['mother_job'] ?? null;
+        $request->parent_address = $data['parent_address'] ?? null;
+        $request->guardian_name = $data['guardian_name'] ?? null;
+        $request->guardian_job = $data['guardian_job'] ?? null;
+        $request->guardian_address = $data['guardian_address'] ?? null;
+        $request->is_re_registered = isset($data['is_re_registered']) ? 1 : 0;
+
+        try {
+            $response = $this->studentRegistrationService->registration($request);
+            error_log("Registration success! Student ID: " . $response->studentRegistration->id);
+
+            // Clear session data
+            unset($_SESSION['registration_form_data']);
+
+            // Set success message
+            $_SESSION['last_registered_id'] = $response->studentRegistration->id;
+            $_SESSION['registration_success'] = true;
+
+            error_log("Redirecting to /students/registration-success");
+            header("Location: /students/registration-success");
+            exit;
+
+        } catch (ValidationException $e) {
+            error_log("Validation error: " . $e->getMessage());
+            $_SESSION['registration_error'] = $e->getMessage();
+            header("Location: /students/registration-multi?step=3");
+            exit;
+        } catch (\Exception $e) {
+            error_log("General error: " . $e->getMessage());
+            $_SESSION['registration_error'] = "Terjadi kesalahan: " . $e->getMessage();
+            header("Location: /students/registration-multi?step=3");
+            exit;
+        }
+    }
+
+    public function cancelRegistration()
+    {
+        unset($_SESSION['registration_form_data']);
+        unset($_SESSION['registration_error']);
+        header("Location: /");
+        exit;
+    }
+
 
     public function registration()
     {
@@ -77,22 +309,78 @@ class StudentController
         $request->guardian_job = $_POST['guardian_job'] ?? null;
         $request->guardian_address = $_POST['guardian_address'] ?? null;
 
-$request->is_re_registered = isset($_POST['is_re_registered']) ? 1 : 0;
+        $request->is_re_registered = isset($_POST['is_re_registered']) ? 1 : 0;
+
         try {
+            $response = $this->studentRegistrationService->registration($request);
 
-            $this->studentRegistrationService->registration($request);
+            // Simpan ID student yang baru registrasi ke session
+            session_start();
+            $_SESSION['last_registered_id'] = $response->studentRegistration->id;
+            $_SESSION['registration_success'] = true;
 
-            View::redirect('/students/registration');
+            // Redirect ke halaman success
+            View::redirect('/students/registration-success');
 
         } catch (ValidationException $exception) {
-
             View::render('Student/registration', [
                 'title' => 'Student Registration',
                 'error' => $exception->getMessage()
             ]);
-
         }
     }
+
+    // Tambahkan method baru untuk halaman success
+    // Perbaiki method registrationSuccess()
+    public function registrationSuccess()
+    {
+        // Cek apakah session sudah aktif sebelum memulai
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $studentId = $_SESSION['last_registered_id'] ?? null;
+        $registrationSuccess = $_SESSION['registration_success'] ?? false;
+
+        if (!$studentId || !$registrationSuccess) {
+            View::redirect('/students/registration');
+            return;
+        }
+
+        $student = $this->studentRegistrationService->findById($studentId);
+
+        View::render('Student/registration_success', [
+            'title' => 'Registrasi Berhasil',
+            'student' => $student,
+            'studentId' => $studentId
+        ]);
+    }
+
+    public function data()
+{
+    // Pastikan session aktif
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    
+    $allStudents = $this->studentRegistrationService->findAll();
+    
+    // Ambil dari session
+    $currentUser = $_SESSION['user'] ?? null;
+    $userRole = $currentUser['role'] ?? 'guest';
+    
+    // DEBUG
+    error_log("=== DATA CONTROLLER ===");
+    error_log("Session user: " . print_r($_SESSION['user'], true));
+    error_log("User Role: " . $userRole);
+    
+    View::render('Student/data', [
+        'title' => 'Student Data',
+        'students' => $allStudents,
+        'user' => $currentUser,
+        'userRole' => $userRole  // WAJIB dikirim
+    ]);
+}
 
     public function edit(int $id)
     {
@@ -101,7 +389,7 @@ $request->is_re_registered = isset($_POST['is_re_registered']) ? 1 : 0;
 
         if ($student == null) {
 
-            View::redirect('/');
+            View::redirect('/students/data');
 
             return;
         }
@@ -119,8 +407,55 @@ $request->is_re_registered = isset($_POST['is_re_registered']) ? 1 : 0;
         $request->id = isset($_POST['id']) ? (int) $_POST['id'] : null;
 
         if (!$request->id) {
-            View::redirect('/');
+            View::redirect('/students/data');
             return;
+        }
+
+        // Ambil data student lama untuk mendapatkan gambar
+        $existingStudent = $this->studentRegistrationService->findById($request->id);
+
+        // Proses upload gambar
+        $imageName = $existingStudent ? $existingStudent->img : null; // Default pakai gambar lama
+
+        // Cek apakah ada upload file baru
+        if (isset($_FILES['img']) && $_FILES['img']['error'] === UPLOAD_ERR_OK) {
+            $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/photos/students-registration/';
+
+            // Buat folder jika belum ada
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0777, true);
+            }
+
+            // Validasi file
+            $allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+            $fileType = mime_content_type($_FILES['img']['tmp_name']);
+
+            if (in_array($fileType, $allowedTypes)) {
+                // Hapus gambar lama jika ada
+                if ($existingStudent && $existingStudent->img && file_exists($uploadDir . $existingStudent->img)) {
+                    unlink($uploadDir . $existingStudent->img);
+                }
+
+                // Upload gambar baru
+                $extension = pathinfo($_FILES['img']['name'], PATHINFO_EXTENSION);
+                $imageName = time() . '_' . uniqid() . '.' . $extension;
+                $uploadPath = $uploadDir . $imageName;
+
+                if (!move_uploaded_file($_FILES['img']['tmp_name'], $uploadPath)) {
+                    $imageName = $existingStudent ? $existingStudent->img : null;
+                }
+            }
+        }
+
+        // Cek apakah user ingin menghapus gambar
+        if (isset($_POST['delete_image']) && $_POST['delete_image'] == '1') {
+            if ($existingStudent && $existingStudent->img) {
+                $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/photos/students-registration/';
+                if (file_exists($uploadDir . $existingStudent->img)) {
+                    unlink($uploadDir . $existingStudent->img);
+                }
+            }
+            $imageName = null;
         }
 
         // DATA WAJIB
@@ -139,7 +474,7 @@ $request->is_re_registered = isset($_POST['is_re_registered']) ? 1 : 0;
         $request->birth_place = $_POST['birth_place'] ?? '';
         $request->birth_date = $_POST['birth_date'] ?? '';
         $request->address = $_POST['address'] ?? '';
-        $request->gender = $_POST['gender'] ?? '';
+        $request->gender = ($_POST['gender'] === 'Laki-laki') ? 'L' : 'P';
 
         $request->child_order = (int) ($_POST['child_order'] ?? 0);
         $request->total_siblings = (int) ($_POST['total_siblings'] ?? 0);
@@ -163,10 +498,13 @@ $request->is_re_registered = isset($_POST['is_re_registered']) ? 1 : 0;
 
         $request->is_re_registered = (isset($_POST['is_re_registered']) && $_POST['is_re_registered'] == '1') ? 1 : 0;
 
+        // Set gambar ke request
+        $request->img = $imageName;
+
         try {
             $this->studentRegistrationService->update($request);
 
-            View::redirect('/');
+            View::redirect('/students/data');
         } catch (\Exception $e) {
             View::render('Student/edit', [
                 'error' => $e->getMessage(),
@@ -183,11 +521,11 @@ $request->is_re_registered = isset($_POST['is_re_registered']) ? 1 : 0;
             $this->studentRegistrationService
                 ->deleteById($id);
 
-            View::redirect('/');
+            View::redirect('/students/data');
 
         } catch (ValidationException $exception) {
 
-            View::redirect('/');
+            View::redirect('/students/data');
         }
     }
 
@@ -198,7 +536,7 @@ $request->is_re_registered = isset($_POST['is_re_registered']) ? 1 : 0;
 
         if (empty($studentIds)) {
 
-            View::redirect('/');
+            View::redirect('/students/data');
 
             return;
         }
@@ -217,7 +555,7 @@ $request->is_re_registered = isset($_POST['is_re_registered']) ? 1 : 0;
             }
         }
 
-        View::redirect('/');
+        View::redirect('/students/data');
     }
 
     public function exportPdf(int $id)
@@ -228,7 +566,7 @@ $request->is_re_registered = isset($_POST['is_re_registered']) ? 1 : 0;
 
         if ($student == null) {
 
-            View::redirect('/');
+            View::redirect('/students/data');
 
             return;
         }
@@ -266,7 +604,7 @@ $request->is_re_registered = isset($_POST['is_re_registered']) ? 1 : 0;
 
         if (empty($studentIds)) {
 
-            View::redirect('/');
+            View::redirect('/students/data');
 
             return;
         }
@@ -318,7 +656,7 @@ $request->is_re_registered = isset($_POST['is_re_registered']) ? 1 : 0;
 
         if (empty($studentIds)) {
 
-            View::redirect('/');
+            View::redirect('/students/data');
 
             return;
         }
@@ -479,20 +817,21 @@ $request->is_re_registered = isset($_POST['is_re_registered']) ? 1 : 0;
 
     public function show(int $id)
     {
-        $student =
-            $this->studentRegistrationService
-                ->findById($id);
+        $student = $this->studentRegistrationService->findById($id);
 
         if ($student == null) {
-
-            View::redirect('/');
-
+            View::redirect('/students/data');
             return;
         }
 
+        // Ambil role user
+        $currentUser = $_SESSION['user'] ?? null;
+        $userRole = $currentUser['role'] ?? 'guest';
+
         View::render('Student/show', [
             'title' => 'Detail Student',
-            'student' => $student
+            'student' => $student,
+            'userRole' => $userRole  // Kirim juga ke view show
         ]);
     }
 
@@ -501,7 +840,7 @@ $request->is_re_registered = isset($_POST['is_re_registered']) ? 1 : 0;
         $ids = $_POST['student_ids'] ?? [];
 
         if (empty($ids)) {
-            header("Location: /");
+            header("Location: /students/data");
             exit;
         }
 
@@ -511,8 +850,9 @@ $request->is_re_registered = isset($_POST['is_re_registered']) ? 1 : 0;
 
         $repo->acceptMultiple($ids);
 
-        header("Location: /");
+        header("Location: /students/data");
         exit;
     }
+
 
 }

@@ -50,8 +50,9 @@ class Router
             }
         }
 
+        // 404 NOT FOUND
         http_response_code(404);
-        echo http_response_code();
-        echo "<br>CONTROLLER NOT FOUND";
+
+        require_once __DIR__ . '/../View/Error/404.php';
     }
 }
