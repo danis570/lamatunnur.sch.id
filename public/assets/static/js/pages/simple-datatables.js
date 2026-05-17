@@ -1,5 +1,9 @@
 let dataTable = new simpleDatatables.DataTable(
-  document.getElementById("table1")
+  document.getElementById("table1"),
+  {
+    perPage: 25,
+    perPageSelect: [5, 10, 25, 50, 100, 1000]
+  }
 )
 // Move "per page dropdown" selector element out of label
 // to make it work with bootstrap 5. Add bs5 classes.

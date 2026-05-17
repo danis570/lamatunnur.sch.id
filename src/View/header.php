@@ -2,7 +2,7 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-transparent">
     <div class="container-fluid px-3">
         <!-- Brand -->
-        <a href="#" class="navbar-brand d-flex align-items-center text-wrap" style="max-width: 100%;">
+        <a href="/" class="navbar-brand d-flex align-items-center text-wrap" style="max-width: 100%;">
             <!-- Logo Sekolah (Ukuran otomatis mengecil di HP) -->
             <img src="/assets/images/logo.png" class="me-2 me-sm-3" alt="Logo" style="height: 40px; max-height: 50px; object-fit: contain;">
             
