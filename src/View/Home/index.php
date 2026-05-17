@@ -9,7 +9,7 @@
     <!-- 
     - primary meta tags
   -->
-    <title>Y Collage Bhdohi</title>
+    <title>MADIN LAM’ATUN NUR</title>
     <meta name="title" content="Youdemi">
     <meta name="description" content="This is a education html template made by codewithsadee">
 

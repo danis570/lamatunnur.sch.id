@@ -168,8 +168,8 @@
                                                 <!-- Perbaikan baris kode yang terpotong di paling bawah -->
                                                 <?php if ($userRole === 'ADMIN'): ?>
                                                     <td class="text-center align-middle">
-                                                        <input type="checkbox" class="row-checkbox" value="<?= $student->id ?>"
-                                                            style="cursor: pointer;">
+                                                        <input type="checkbox" name="student_ids[]" value="<?= $student->id ?>"
+                                                            class="row-check" style="cursor: pointer;">
                                                     </td>
                                                 <?php endif; ?>
                                             </tr>
@@ -186,65 +186,6 @@
             <!-- Script - HANYA JALANKAN UNTUK ADMIN -->
             <?php if ($userRole === 'ADMIN'): ?>
                 <script>
-                    document.addEventListener('DOMContentLoaded', function () {
-                        const checkAll = document.getElementById('checkAll');
-                        const rowCheckboxes = document.querySelectorAll('.row-checkbox');
-                        const bulkActionCard = document.getElementById('bulkActionCard');
-                        const selectedIdsInput = document.getElementById('selectedIds');
-
-                        if (!bulkActionCard) return;
-
-                        // Fungsi update array ID terpilih dan kelola visibilitas card menu
-                        function updateSelectedIds() {
-                            const checkedBoxes = document.querySelectorAll('.row-checkbox:checked');
-                            const ids = Array.from(checkedBoxes).map(cb => cb.value);
-
-                            selectedIdsInput.value = ids.join(',');
-
-                            if (ids.length > 0) {
-                                // JIKA ADA YANG DICENTANG:
-                                if (bulkActionCard.style.display === 'none') {
-                                    bulkActionCard.style.display = 'block'; // Pasang display dulu
-                                    // Berikan jeda 10ms menggunakan setTimeout agar efek CSS 'fade' Bootstrap bisa nge-trigger animasi smooth
-                                    setTimeout(() => {
-                                        bulkActionCard.classList.add('show'); // Tambah class show bawaan Mazer/Bootstrap
-                                    }, 10);
-                                }
-                            } else {
-                                // JIKA KOSONG / BERSIH:
-                                bulkActionCard.classList.remove('show'); // Hapus class show (efek memudar ke transparan)
-
-                                // Tunggu animasi pudar selesai (300ms sesuai durasi default Bootstrap), lalu sembunyikan display-nya
-                                setTimeout(() => {
-                                    if (!bulkActionCard.classList.contains('show')) {
-                                        bulkActionCard.style.display = 'none';
-                                    }
-                                }, 300);
-                            }
-                        }
-
-
-                        // Event master Check All
-                        if (checkAll) {
-                            checkAll.addEventListener('change', function () {
-                                rowCheckboxes.forEach(cb => cb.checked = checkAll.checked);
-                                updateSelectedIds();
-                            });
-                        }
-
-                        // Event sub-checkbox tiap baris data
-                        rowCheckboxes.forEach(cb => {
-                            cb.addEventListener('change', function () {
-                                if (!cb.checked && checkAll) checkAll.checked = false;
-
-                                const allChecked = document.querySelectorAll('.row-checkbox:checked').length === rowCheckboxes.length;
-                                if (allChecked && checkAll) checkAll.checked = true;
-
-                                updateSelectedIds();
-                            });
-                        });
-                    });
-
 
                     document.addEventListener("DOMContentLoaded", function () {
                         // ==========================================
@@ -276,6 +217,41 @@
                             }
                         }
 
+                        const selectedIdsInput = document.getElementById('selectedIds');
+
+
+                        // Tambahkan fungsi ini setelah updateCheckAllState()
+                        function updateBulkActionCard() {
+                            const bulkActionCard = document.getElementById('bulkActionCard');
+                            if (!bulkActionCard) return;
+
+                            const checkedCount = document.querySelectorAll('.row-check:checked').length;
+
+                            // Update hidden input
+                            const ids = [];
+                            document.querySelectorAll('.row-check:checked').forEach(cb => {
+                                if (cb.value) ids.push(cb.value);
+                            });
+                            if (selectedIdsInput) selectedIdsInput.value = ids.join(',');
+
+                            // Tampilkan/sembunyikan menu selected
+                            if (checkedCount > 0) {
+                                if (bulkActionCard.style.display === 'none') {
+                                    bulkActionCard.style.display = 'block';
+                                    setTimeout(() => {
+                                        bulkActionCard.classList.add('show');
+                                    }, 10);
+                                }
+                            } else {
+                                bulkActionCard.classList.remove('show');
+                                setTimeout(() => {
+                                    if (!bulkActionCard.classList.contains('show')) {
+                                        bulkActionCard.style.display = 'none';
+                                    }
+                                }, 300);
+                            }
+                        }
+
                         checkAll.addEventListener("click", function (e) {
                             e.stopPropagation();
                             const isChecked = checkAll.checked;
@@ -286,17 +262,22 @@
                             });
 
                             checkAll.indeterminate = false;
+                            updateBulkActionCard()
                         });
 
                         function bindRowCheckEvents() {
                             document.querySelectorAll(".row-check").forEach(cb => {
                                 cb.removeEventListener("change", updateCheckAllState);
-                                cb.addEventListener("change", updateCheckAllState);
+                                cb.addEventListener("change", function () {
+                                    updateCheckAllState();
+                                    updateBulkActionCard();  // ← TAMBAHKAN INI
+                                });
                             });
                         }
 
                         bindRowCheckEvents();
                         updateCheckAllState();
+                        updateBulkActionCard();
 
                         const observer = new MutationObserver(function () {
                             bindRowCheckEvents();
@@ -316,7 +297,6 @@
                         const btnExportPDF = document.getElementById('btnExportPDF');
                         const btnExportExcel = document.getElementById('btnExportExcel');
                         const bulkActionForm = document.getElementById('bulkActionForm');
-                        const selectedIdsInput = document.getElementById('selectedIds');
 
                         const bulkActionModal = new bootstrap.Modal(document.getElementById('bulkActionModal'));
                         const modalTitle = document.getElementById('bulkActionModalTitle');
@@ -386,7 +366,9 @@
                         function executeBulkAction() {
                             bulkActionModal.hide();
 
+                            // ambil selected ids
                             selectedIdsInput.value = JSON.stringify(currentSelectedIds);
+
                             bulkActionForm.action = currentActionUrl;
                             bulkActionForm.method = 'POST';
                             bulkActionForm.submit();
@@ -438,216 +420,6 @@
     <script src="/assets/extensions/simple-datatables/umd/simple-datatables.js"></script>
     <script src="/assets/static/js/pages/simple-datatables.js"></script>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            // ==========================================
-            // CHECKBOX LOGIC (Select All)
-            // ==========================================
-            const checkAll = document.getElementById("checkAll");
-            if (!checkAll) return;
-
-            function getRowChecks() {
-                return document.querySelectorAll(".row-check");
-            }
-
-            function updateCheckAllState() {
-                const rowChecks = getRowChecks();
-                const total = rowChecks.length;
-                const checkedCount = document.querySelectorAll(".row-check:checked").length;
-
-                if (total === 0) return;
-
-                if (checkedCount === total) {
-                    checkAll.checked = true;
-                    checkAll.indeterminate = false;
-                } else if (checkedCount === 0) {
-                    checkAll.checked = false;
-                    checkAll.indeterminate = false;
-                } else {
-                    checkAll.checked = false;
-                    checkAll.indeterminate = true;
-                }
-            }
-
-            // Select All - Click handler
-            checkAll.addEventListener("click", function (e) {
-                e.stopPropagation();
-                const isChecked = checkAll.checked;
-                const rowChecks = getRowChecks();
-
-                rowChecks.forEach(cb => {
-                    cb.checked = isChecked;
-                });
-
-                checkAll.indeterminate = false;
-            });
-
-            // Bind event untuk setiap row checkbox
-            function bindRowCheckEvents() {
-                document.querySelectorAll(".row-check").forEach(cb => {
-                    cb.removeEventListener("change", updateCheckAllState);
-                    cb.addEventListener("change", updateCheckAllState);
-                });
-            }
-
-            bindRowCheckEvents();
-            updateCheckAllState();
-
-            // Observer untuk row yang ditambahkan secara dinamis
-            const observer = new MutationObserver(function () {
-                bindRowCheckEvents();
-                updateCheckAllState();
-            });
-
-            const tbody = document.querySelector('#table1 tbody');
-            if (tbody) {
-                observer.observe(tbody, { childList: true, subtree: true });
-            }
-
-            // ==========================================
-            // BULK ACTIONS WITH MODAL (Tanpa Loading Modal)
-            // ==========================================
-            const btnAcceptSelected = document.getElementById('btnAcceptSelected');
-            const btnDeleteSelected = document.getElementById('btnDeleteSelected');
-            const btnExportPDF = document.getElementById('btnExportPDF');
-            const btnExportExcel = document.getElementById('btnExportExcel');
-            const bulkActionForm = document.getElementById('bulkActionForm');
-            const selectedIdsInput = document.getElementById('selectedIds');
-
-            // Modal elements (hanya modal konfirmasi)
-            const bulkActionModal = new bootstrap.Modal(document.getElementById('bulkActionModal'));
-            const modalTitle = document.getElementById('bulkActionModalTitle');
-            const modalBody = document.getElementById('bulkActionModalBody');
-            const confirmBtn = document.getElementById('bulkActionConfirmBtn');
-
-            // Variables to store current action
-            let currentActionUrl = '';
-            let currentSelectedIds = [];
-            let currentIsDelete = false;
-
-            // Fungsi untuk mendapatkan ID yang terpilih
-            function getSelectedIds() {
-                const selected = [];
-                document.querySelectorAll('.row-check:checked').forEach(cb => {
-                    if (cb.value) {
-                        selected.push(cb.value);
-                    }
-                });
-                return selected;
-            }
-
-            // Fungsi untuk menampilkan modal konfirmasi
-            function showConfirmModal(actionUrl, isDelete = false) {
-                const selectedIds = getSelectedIds();
-
-                if (selectedIds.length === 0) {
-                    // Tampilkan modal error
-                    modalTitle.innerHTML = '<i class="bi bi-exclamation-triangle text-warning"></i> Peringatan';
-                    modalBody.innerHTML = 'Pilih minimal satu data terlebih dahulu!';
-                    confirmBtn.classList.add('d-none');
-                    bulkActionModal.show();
-
-                    // Sembunyikan tombol confirm setelah 2 detik dan tutup modal
-                    setTimeout(() => {
-                        bulkActionModal.hide();
-                        confirmBtn.classList.remove('d-none');
-                    }, 2000);
-                    return;
-                }
-
-                currentActionUrl = actionUrl;
-                currentSelectedIds = selectedIds;
-                currentIsDelete = isDelete;
-
-                // Set modal content berdasarkan action
-                let actionText = '';
-                let confirmClass = '';
-
-                if (actionUrl.includes('accept-multiple')) {
-                    actionText = 'mendaftarkan ulang';
-                    modalTitle.innerHTML = '<i class="bi bi-check2-circle text-success"></i> Konfirmasi Daftar Ulang';
-                    modalBody.innerHTML = `Apakah Anda yakin ingin <strong>mendaftarkan ulang</strong> <strong class="text-primary">${selectedIds.length}</strong> siswa yang terpilih?`;
-                    confirmBtn.className = 'btn btn-success ms-1';
-                    confirmBtn.innerHTML = '<i class="bi bi-check2-circle"></i> <span class="d-none d-sm-block">Ya, Daftarkan</span>';
-                }
-                else if (actionUrl.includes('delete-multiple')) {
-                    actionText = 'menghapus';
-                    modalTitle.innerHTML = '<i class="bi bi-exclamation-triangle text-danger"></i> Konfirmasi Hapus';
-                    modalBody.innerHTML = `Apakah Anda yakin ingin <strong class="text-danger">menghapus</strong> <strong class="text-primary">${selectedIds.length}</strong> siswa yang terpilih?<br><small class="text-muted">Data yang dihapus tidak dapat dikembalikan!</small>`;
-                    confirmBtn.className = 'btn btn-danger ms-1';
-                    confirmBtn.innerHTML = '<i class="bi bi-trash"></i> <span class="d-none d-sm-block">Ya, Hapus</span>';
-                }
-                else if (actionUrl.includes('export/pdf')) {
-                    modalTitle.innerHTML = '<i class="bi bi-file-pdf text-danger"></i> Konfirmasi Export PDF';
-                    modalBody.innerHTML = `Apakah Anda yakin ingin <strong>mengexport</strong> <strong class="text-primary">${selectedIds.length}</strong> data siswa ke <strong>PDF</strong>?`;
-                    confirmBtn.className = 'btn btn-secondary ms-1';
-                    confirmBtn.innerHTML = '<i class="bi bi-file-pdf"></i> <span class="d-none d-sm-block">Ya, Export</span>';
-                }
-                else if (actionUrl.includes('export/excel')) {
-                    modalTitle.innerHTML = '<i class="bi bi-file-earmark-spreadsheet text-success"></i> Konfirmasi Export Excel';
-                    modalBody.innerHTML = `Apakah Anda yakin ingin <strong>mengexport</strong> <strong class="text-primary">${selectedIds.length}</strong> data siswa ke <strong>Excel</strong>?`;
-                    confirmBtn.className = 'btn btn-info text-white ms-1';
-                    confirmBtn.innerHTML = '<i class="bi bi-file-earmark-spreadsheet"></i> <span class="d-none d-sm-block">Ya, Export</span>';
-                }
-
-                // Tampilkan modal
-                bulkActionModal.show();
-            }
-
-            // Fungsi eksekusi action
-            function executeBulkAction() {
-                // Tutup modal konfirmasi
-                bulkActionModal.hide();
-
-                // Set value ke hidden input
-                selectedIdsInput.value = JSON.stringify(currentSelectedIds);
-
-                // Set form action dan submit
-                bulkActionForm.action = currentActionUrl;
-                bulkActionForm.method = 'POST';
-
-                // Submit langsung tanpa delay
-                bulkActionForm.submit();
-            }
-
-            // Event listener untuk tombol konfirmasi
-            confirmBtn.addEventListener('click', executeBulkAction);
-
-            // Event listeners untuk tombol bulk actions
-            if (btnAcceptSelected) {
-                btnAcceptSelected.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    showConfirmModal('/students/accept-multiple');
-                });
-            }
-
-            if (btnDeleteSelected) {
-                btnDeleteSelected.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    showConfirmModal('/students/delete-multiple', true);
-                });
-            }
-
-            if (btnExportPDF) {
-                btnExportPDF.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    showConfirmModal('/students/export/pdf-multiple');
-                });
-            }
-
-            if (btnExportExcel) {
-                btnExportExcel.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    showConfirmModal('/students/export/excel-multiple');
-                });
-            }
-
-            // Inisialisasi Feather Icons (jika diperlukan)
-            if (typeof feather !== 'undefined') {
-                feather.replace();
-            }
-        });
-    </script>
     <!-- Modal Konfirmasi Bulk Actions -->
     <div class="modal fade text-left" id="bulkActionModal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
