@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Pendaftar</title>
 
-     <!-- Favicon -->
+    <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
 
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
@@ -46,7 +46,7 @@
                 <div class="page-title">
                     <div class="row">
                         <div class="col-12 col-md-6 order-md-1 order-last">
-                            <h3>Data Student</h3>
+                            <h3>Data Santri</h3>
                             <p class="text-subtitle text-muted">
                                 -
                         </div>
@@ -54,7 +54,7 @@
                             <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
                                 <ol class="breadcrumb">
                                     <li class="breadcrumb-item"><a href="/">Dashboard</a></li>
-                                    <li class="breadcrumb-item active" aria-current="page">Data Siswa</li>
+                                    <li class="breadcrumb-item active" aria-current="page">Data Santri</li>
                                 </ol>
                             </nav>
                         </div>
@@ -63,7 +63,7 @@
                 <section class="section">
                     <div class="card">
                         <div class="card-header">
-                            <h5 class="card-title">Table Student</h5>
+                            <h5 class="card-title">Table Pendaftar</h5>
                         </div>
                         <div class="card-body">
 
@@ -74,21 +74,25 @@
                                     <div class="card-body py-3 bg-light-secondary rounded">
                                         <div class="d-flex gap-2 flex-wrap">
                                             <button type="button" id="btnAcceptSelected" class="btn btn-sm btn-success">
-                                                <i class="bi bi-check2-circle"></i> Accept Selected
+                                                <i class="bi bi-check2-circle"></i> Terima Pilihan
                                             </button>
 
                                             <button type="button" id="btnDeleteSelected" class="btn btn-sm btn-danger">
-                                                <i class="bi bi-trash"></i> Delete Selected
+                                                <i class="bi bi-trash"></i> hapus Pilihan
                                             </button>
 
                                             <button type="button" id="btnExportPDF" class="btn btn-sm btn-secondary">
-                                                <i class="bi bi-file-pdf"></i> Export PDF
+                                                <i class="bi bi-file-pdf"></i> Ekspor PDF
                                             </button>
 
                                             <button type="button" id="btnExportExcel"
                                                 class="btn btn-sm btn-info text-white">
-                                                <i class="bi bi-file-earmark-spreadsheet"></i> Export Excel
+                                                <i class="bi bi-file-earmark-spreadsheet"></i> Ekspor Excel
                                             </button>
+                                            <span class="badge bg-primary ms-2" id="selectedCountBadge"
+                                                style="font-size: 14px; padding: 8px 12px;">
+                                                <i class="bi bi-check-square"></i>
+                                            </span>
                                         </div>
                                     </div>
                                 </div>
@@ -157,13 +161,10 @@
                                                                 <hr class="dropdown-divider">
                                                             </li>
                                                             <li>
-                                                                <form method="POST" action="/students/delete"
-                                                                    onsubmit="return confirm('Yakin hapus data ini?')">
-                                                                    <button type="submit" name="id" value="<?= $student->id ?>"
-                                                                        class="dropdown-item text-danger">
-                                                                        <i class="bi bi-trash"></i> Delete
-                                                                    </button>
-                                                                </form>
+                                                                <button type="button" class="dropdown-item text-danger"
+                                                                    onclick="showDeleteSingleModal(<?= $student->id ?>, '<?= htmlspecialchars($student->full_name) ?>')">
+                                                                    <i class="bi bi-trash"></i> Delete
+                                                                </button>
                                                             </li>
                                                         <?php endif; ?>
                                                     </ul>
@@ -191,7 +192,59 @@
             <?php if ($userRole === 'ADMIN'): ?>
                 <script>
 
+                    // Variabel global untuk menyimpan data yang akan dihapus
+                    let pendingDeleteId = null;
+                    let pendingDeleteName = '';
+
+                    // Fungsi untuk menampilkan modal delete single
+                    function showDeleteSingleModal(studentId, studentName) {
+                        pendingDeleteId = studentId;
+                        pendingDeleteName = studentName;
+
+                        // Update modal dengan nama siswa
+                        document.getElementById('deleteStudentName').innerHTML = studentName;
+
+                        // Tampilkan modal
+                        const modal = new bootstrap.Modal(document.getElementById('deleteSingleModal'));
+                        modal.show();
+                    }
+
+                    // Fungsi eksekusi delete single (dipanggil dari modal)
+                    function executeDeleteSingle() {
+                        if (!pendingDeleteId) return;
+
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = '/students/delete';
+                        form.style.display = 'none';
+
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'id';
+                        input.value = pendingDeleteId;
+
+                        form.appendChild(input);
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+
+
                     document.addEventListener("DOMContentLoaded", function () {
+
+                        // ==========================================
+                        // DELETE SINGLE MODAL CONFIRM BUTTON
+                        // ==========================================
+                        const confirmDeleteSingleBtn = document.getElementById('confirmDeleteSingleBtn');
+                        if (confirmDeleteSingleBtn) {
+                            confirmDeleteSingleBtn.addEventListener('click', function () {
+                                // Tutup modal dulu
+                                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteSingleModal'));
+                                modal.hide();
+                                // Eksekusi delete
+                                executeDeleteSingle();
+                            });
+                        }
+
                         // ==========================================
                         // CHECKBOX LOGIC (Select All)
                         // ==========================================
@@ -230,6 +283,21 @@
                             if (!bulkActionCard) return;
 
                             const checkedCount = document.querySelectorAll('.row-check:checked').length;
+
+                            // TAMBAHKAN INI: Update badge jumlah selected
+                            const selectedCountBadge = document.getElementById('selectedCountBadge');
+                            if (selectedCountBadge) {
+                                selectedCountBadge.innerHTML = `<i class="bi bi-check-square"></i> : ${checkedCount} Dipilih`;
+
+                                // Optional: Ubah warna badge jika banyak yang dipilih
+                                if (checkedCount > 0) {
+                                    selectedCountBadge.classList.remove('bg-primary');
+                                    selectedCountBadge.classList.add('bg-success');
+                                } else {
+                                    selectedCountBadge.classList.remove('bg-success');
+                                    selectedCountBadge.classList.add('bg-primary');
+                                }
+                            }
 
                             // Update hidden input
                             const ids = [];
@@ -414,7 +482,6 @@
     </div>
 
 
-
     <script src="/assets/static/js/components/dark.js"></script>
     <script src="/assets/extensions/perfect-scrollbar/perfect-scrollbar.min.js"></script>
 
@@ -445,6 +512,32 @@
                     <button type="button" class="btn btn-primary ms-1" id="bulkActionConfirmBtn">
                         <i class="bx bx-check d-block d-sm-none"></i>
                         <span class="d-none d-sm-block">Ya, Lanjutkan</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Konfirmasi Delete Single -->
+    <div class="modal fade text-left" id="deleteSingleModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger" id="deleteSingleModalTitle">
+                        <i class="bi bi-exclamation-triangle-fill"></i> Konfirmasi Hapus Data
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="deleteSingleModalBody">
+                    Apakah Anda yakin ingin menghapus data siswa <strong id="deleteStudentName"></strong>?
+                    <br><small class="text-muted">Data yang dihapus tidak dapat dikembalikan!</small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-arrow-left"></i> Batal
+                    </button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteSingleBtn">
+                        <i class="bi bi-trash"></i> Ya, Hapus
                     </button>
                 </div>
             </div>

@@ -124,22 +124,44 @@
                                                         required>
                                                 </div>
                                                 <div class="col-md-6 mb-3">
-                                                    <label class="form-label fw-bold">NIK <span
-                                                            class="text-danger">*</span></label>
-                                                    <input type="text" name="student_nik" class="form-control"
+
+                                                    <label class="form-label fw-bold">
+                                                        NIK <span class="text-danger">*</span>
+                                                    </label>
+
+                                                    <input type="text"
+                                                        name="student_nik"
+                                                        class="form-control"
                                                         value="<?= htmlspecialchars($model['formData']['student_nik'] ?? '') ?>"
-                                                        required>
+                                                        required
+                                                        maxlength="16"
+                                                        inputmode="numeric"
+                                                        pattern="[0-9]*"
+                                                        oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+
+                                                    <small class="text-muted">
+                                                        16 digit
+                                                    </small>
+
                                                 </div>
                                             </div>
 
                                             <div class="row">
                                                 <div class="col-md-6 mb-3">
-                                                    <label class="form-label fw-bold">Tempat Lahir <span
-                                                            class="text-danger">*</span></label>
-                                                    <input type="text" name="birth_place" class="form-control"
-                                                        value="<?= htmlspecialchars($model['formData']['birth_place'] ?? '') ?>"
-                                                        required>
-                                                </div>
+
+                                                <label class="form-label fw-bold">
+                                                    Tempat Lahir <span class="text-danger">*</span>
+                                                </label>
+
+                                                <input type="text"
+                                                    name="birth_place"
+                                                    class="form-control"
+                                                    value="<?= htmlspecialchars($model['formData']['birth_place'] ?? '') ?>"
+                                                    required
+                                                    inputmode="text"
+                                                    pattern="[A-Za-z\s]+"
+                                                    oninput="this.value = this.value.replace(/[^A-Za-z\s]/g, '')">
+                                            </div>
                                                 <div class="col-md-6 mb-3">
                                                     <label class="form-label fw-bold">Tanggal Lahir <span
                                                             class="text-danger">*</span></label>
@@ -176,22 +198,53 @@
                                                     </select>
                                                 </div>
                                                 <div class="col-md-4 mb-3">
-                                                    <label class="form-label fw-bold">No HP Orang Tua</label>
-                                                    <input type="text" name="parent_phone" class="form-control"
-                                                        value="<?= htmlspecialchars($model['formData']['parent_phone'] ?? '') ?>">
+
+                                                    <label class="form-label fw-bold">
+                                                        No HP Orang Tua
+                                                    </label>
+
+                                                    <input type="text"
+                                                        name="parent_phone"
+                                                        class="form-control"
+                                                        value="<?= htmlspecialchars($model['formData']['parent_phone'] ?? '') ?>"
+                                                        inputmode="tel"
+                                                        pattern="[0-9+\-\s]+"
+                                                        oninput="this.value = this.value.replace(/[^0-9+\-\s]/g, '')">
+
                                                 </div>
                                             </div>
 
                                             <div class="row">
                                                 <div class="col-md-6 mb-3">
-                                                    <label class="form-label fw-bold">Anak Ke-</label>
-                                                    <input type="number" name="child_order" class="form-control"
-                                                        value="<?= htmlspecialchars($model['formData']['child_order'] ?? '') ?>">
+
+                                                    <label class="form-label fw-bold">
+                                                        Anak Ke-
+                                                    </label>
+
+                                                    <input type="text"
+                                                        name="child_order"
+                                                        class="form-control"
+                                                        value="<?= htmlspecialchars($model['formData']['child_order'] ?? '') ?>"
+                                                        inputmode="numeric"
+                                                        pattern="[0-9]*"
+                                                        oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+
                                                 </div>
+
                                                 <div class="col-md-6 mb-3">
-                                                    <label class="form-label fw-bold">Jumlah Saudara</label>
-                                                    <input type="number" name="total_siblings" class="form-control"
-                                                        value="<?= htmlspecialchars($model['formData']['total_siblings'] ?? '') ?>">
+
+                                                    <label class="form-label fw-bold">
+                                                        Jumlah Saudara
+                                                    </label>
+
+                                                    <input type="text"
+                                                        name="total_siblings"
+                                                        class="form-control"
+                                                        value="<?= htmlspecialchars($model['formData']['total_siblings'] ?? '') ?>"
+                                                        inputmode="numeric"
+                                                        pattern="[0-9]*"
+                                                        oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+
                                                 </div>
                                             </div>
                                         </div>
