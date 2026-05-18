@@ -108,7 +108,7 @@
                                                             <i class="bi bi-camera-fill"></i>
                                                         </button>
                                                         <input type="file" name="img" id="photoInput" accept="image/*"
-                                                            style="display: none;">
+                                                            style="display: none;" required>
                                                     </div>
                                                     <small class="text-muted d-block mt-2">Format: JPG, PNG
                                                         (3x4)</small>
@@ -477,212 +477,454 @@
         // ==========================================
         // MULTI-STEP NAVIGATION - TANPA SUBMIT SAAT PREV
         // ==========================================
+        document.addEventListener('DOMContentLoaded', function () {
 
-        let currentStep = parseInt(document.getElementById('currentStep').value) || 1;
+            let currentStep = 1;
 
-        const step1Content = document.getElementById('step1Content');
-        const step2Content = document.getElementById('step2Content');
-        const step3Content = document.getElementById('step3Content');
-        const step1Indicator = document.getElementById('step1Indicator');
-        const step2Indicator = document.getElementById('step2Indicator');
-        const step3Indicator = document.getElementById('step3Indicator');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const submitBtn = document.getElementById('submitBtn');
-        const progressBar = document.getElementById('progressBar');
-        const form = document.getElementById('multiStepForm');
-        const stepInput = document.getElementById('currentStep');
+            // STEP 0: ambil element dulu (WAJIB DI ATAS)
+            const stepInput = document.getElementById('currentStep');
 
-        // Fungsi untuk menampilkan modal error
-        function showErrorModal(message) {
-            const modalTitle = document.getElementById('confirmModalTitle');
-            const modalBody = document.getElementById('confirmModalBody');
-            const modalBtn = document.getElementById('confirmModalBtn');
+            // 1. ambil dari URL (PALING PRIORITAS)
+            const urlParams = new URLSearchParams(window.location.search);
+            const stepFromUrl = parseInt(urlParams.get('step'));
 
-            modalTitle.innerHTML = 'Validasi Gagal';
-            modalBody.innerHTML = message;
-            modalBtn.className = 'btn btn-danger ms-1';
-
-            const newBtn = modalBtn.cloneNode(true);
-            modalBtn.parentNode.replaceChild(newBtn, modalBtn);
-
-            newBtn.addEventListener('click', function () {
-                const modal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
-                modal.hide();
-            });
-
-            const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
-            modal.show();
-        }
-
-        // Fungsi untuk konfirmasi final submit
-        function showConfirmModal(message, onConfirm) {
-            const modalTitle = document.getElementById('confirmModalTitle');
-            const modalBody = document.getElementById('confirmModalBody');
-            const modalBtn = document.getElementById('confirmModalBtn');
-
-            modalTitle.innerHTML = 'Konfirmasi';
-            modalBody.innerHTML = message;
-            modalBtn.className = 'btn btn-success ms-1';
-            modalBtn.innerHTML = '<i class="bi bi-check-circle"></i> Ya, Simpan';
-
-            const newBtn = modalBtn.cloneNode(true);
-            modalBtn.parentNode.replaceChild(newBtn, modalBtn);
-
-            newBtn.addEventListener('click', function () {
-                const modal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
-                modal.hide();
-                onConfirm();
-            });
-
-            const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
-            modal.show();
-        }
-
-        function updateStepUI(step) {
-            step1Content.style.display = 'none';
-            step2Content.style.display = 'none';
-            step3Content.style.display = 'none';
-
-            if (step === 1) step1Content.style.display = 'block';
-            else if (step === 2) step2Content.style.display = 'block';
-            else if (step === 3) step3Content.style.display = 'block';
-
-            step1Indicator.classList.remove('active', 'completed');
-            step2Indicator.classList.remove('active', 'completed');
-            step3Indicator.classList.remove('active', 'completed');
-
-            if (step > 1) step1Indicator.classList.add('completed');
-            if (step > 2) step2Indicator.classList.add('completed');
-
-            if (step === 1) step1Indicator.classList.add('active');
-            else if (step === 2) step2Indicator.classList.add('active');
-            else if (step === 3) step3Indicator.classList.add('active');
-
-            const progressPercentage = (step / 3) * 100;
-            progressBar.style.width = progressPercentage + '%';
-
-            if (step === 1) {
-                prevBtn.style.display = 'none';
-                nextBtn.style.display = 'inline-flex';
-                submitBtn.style.display = 'none';
-                nextBtn.classList.add('ms-auto');
-            } else if (step === 3) {
-                prevBtn.style.display = 'inline-flex';
-                nextBtn.style.display = 'none';
-                submitBtn.style.display = 'inline-flex';
-                prevBtn.classList.remove('ms-auto');
-            } else {
-                prevBtn.style.display = 'inline-flex';
-                nextBtn.style.display = 'inline-flex';
-                submitBtn.style.display = 'none';
-                prevBtn.classList.remove('ms-auto');
-            }
-
-            stepInput.value = step;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function validateStep(step) {
-            if (step === 1) {
-                const fullName = document.querySelector('input[name="full_name"]')?.value.trim();
-                const nik = document.querySelector('input[name="student_nik"]')?.value.trim();
-                const birthPlace = document.querySelector('input[name="birth_place"]')?.value.trim();
-                const birthDate = document.querySelector('input[name="birth_date"]')?.value;
-                const address = document.querySelector('textarea[name="address"]')?.value.trim();
-                const gender = document.querySelector('select[name="gender"]')?.value;
-                const religion = document.querySelector('select[name="religion"]')?.value;
-
-                if (!fullName) { showErrorModal('Nama lengkap wajib diisi!'); return false; }
-                if (!nik) { showErrorModal('NIK wajib diisi!'); return false; }
-                if (!birthPlace) { showErrorModal('Tempat lahir wajib diisi!'); return false; }
-                if (!birthDate) { showErrorModal('Tanggal lahir wajib diisi!'); return false; }
-                if (!address) { showErrorModal('Alamat wajib diisi!'); return false; }
-                if (!gender) { showErrorModal('Jenis kelamin wajib dipilih!'); return false; }
-                if (!religion) { showErrorModal('Agama wajib diisi!'); return false; }
-            }
-            return true;
-        }
-
-        // SUBMIT FORM - HANYA UNTUK NEXT (menyimpan ke server)
-        function submitStep(step) {
-            stepInput.value = step;
-            form.submit();
-        }
-
-        // Next button - SUBMIT ke server untuk menyimpan data
-        nextBtn.addEventListener('click', function (e) {
-            e.preventDefault();
-            if (validateStep(currentStep)) {
-                if (currentStep < 3) {
-                    submitStep(currentStep);
+            // 2. ambil dari localStorage
+            const savedData = localStorage.getItem('student_registration_form');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                if (data.currentStep && !stepFromUrl) {
+                    currentStep = parseInt(data.currentStep);
                 }
             }
-        });
 
-        // Previous button - TIDAK SUBMIT, hanya navigasi lokal
-        prevBtn.addEventListener('click', function (e) {
-            e.preventDefault();
-            if (currentStep > 1) {
-                currentStep--;
-                updateStepUI(currentStep);
+            // 3. fallback hidden input
+            if (stepInput?.value && !stepFromUrl && !savedData) {
+                currentStep = parseInt(stepInput.value);
             }
-        });
 
-        // Tombol Submit Final - dengan konfirmasi
-        if (submitBtn) {
-            submitBtn.addEventListener('click', function (e) {
-                e.preventDefault();
-                showConfirmModal('Apakah Anda yakin data yang diisi sudah benar?', function () {
-                    stepInput.value = 3;
-                    form.submit();
+            const step1Content = document.getElementById('step1Content');
+            const step2Content = document.getElementById('step2Content');
+            const step3Content = document.getElementById('step3Content');
+            const step1Indicator = document.getElementById('step1Indicator');
+            const step2Indicator = document.getElementById('step2Indicator');
+            const step3Indicator = document.getElementById('step3Indicator');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const submitBtn = document.getElementById('submitBtn');
+            const progressBar = document.getElementById('progressBar');
+            const form = document.getElementById('multiStepForm');
+
+            // Fungsi untuk menampilkan modal error
+            function showErrorModal(message) {
+                const modalTitle = document.getElementById('confirmModalTitle');
+                const modalBody = document.getElementById('confirmModalBody');
+                const modalBtn = document.getElementById('confirmModalBtn');
+
+                modalTitle.innerHTML = 'Validasi Gagal';
+                modalBody.innerHTML = message;
+                modalBtn.className = 'btn btn-danger ms-1';
+
+                const newBtn = modalBtn.cloneNode(true);
+                modalBtn.parentNode.replaceChild(newBtn, modalBtn);
+
+                newBtn.addEventListener('click', function () {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
+                    modal.hide();
                 });
-            });
-        }
 
-        // Photo preview
-        const photoInput = document.getElementById('photoInput');
-        const photoPreview = document.getElementById('photoPreview');
-        const uploadPhotoBtn = document.getElementById('uploadPhotoBtn');
+                const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+                modal.show();
+            }
 
-        if (uploadPhotoBtn) {
-            uploadPhotoBtn.addEventListener('click', function () {
-                photoInput.click();
-            });
-        }
+            // Fungsi untuk konfirmasi final submit
+            function showConfirmModal(message, onConfirm) {
+                const modalTitle = document.getElementById('confirmModalTitle');
+                const modalBody = document.getElementById('confirmModalBody');
+                const modalBtn = document.getElementById('confirmModalBtn');
 
-        if (photoInput) {
-            photoInput.addEventListener('change', function (e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        photoPreview.src = e.target.result;
-                    };
-                    reader.readAsDataURL(file);
+                modalTitle.innerHTML = 'Konfirmasi';
+                modalBody.innerHTML = message;
+                modalBtn.className = 'btn btn-success ms-1';
+                modalBtn.innerHTML = '<i class="bi bi-check-circle"></i> Ya, Simpan';
+
+                const newBtn = modalBtn.cloneNode(true);
+                modalBtn.parentNode.replaceChild(newBtn, modalBtn);
+
+                newBtn.addEventListener('click', function () {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('confirmModal'));
+                    modal.hide();
+                    onConfirm();
+                });
+
+                const modal = new bootstrap.Modal(document.getElementById('confirmModal'));
+                modal.show();
+            }
+
+            function updateStepUI(step) {
+                step1Content.style.display = 'none';
+                step2Content.style.display = 'none';
+                step3Content.style.display = 'none';
+
+                if (step === 1) step1Content.style.display = 'block';
+                else if (step === 2) step2Content.style.display = 'block';
+                else if (step === 3) step3Content.style.display = 'block';
+
+                step1Indicator.classList.remove('active', 'completed');
+                step2Indicator.classList.remove('active', 'completed');
+                step3Indicator.classList.remove('active', 'completed');
+
+                if (step > 1) step1Indicator.classList.add('completed');
+                if (step > 2) step2Indicator.classList.add('completed');
+
+                if (step === 1) step1Indicator.classList.add('active');
+                else if (step === 2) step2Indicator.classList.add('active');
+                else if (step === 3) step3Indicator.classList.add('active');
+
+                const progressPercentage = (step / 3) * 100;
+                progressBar.style.width = progressPercentage + '%';
+
+                if (step === 1) {
+                    prevBtn.style.display = 'none';
+                    nextBtn.style.display = 'inline-flex';
+                    submitBtn.style.display = 'none';
+                    nextBtn.classList.add('ms-auto');
+                } else if (step === 3) {
+                    prevBtn.style.display = 'inline-flex';
+                    nextBtn.style.display = 'none';
+                    submitBtn.style.display = 'inline-flex';
+                    prevBtn.classList.remove('ms-auto');
+                } else {
+                    prevBtn.style.display = 'inline-flex';
+                    nextBtn.style.display = 'inline-flex';
+                    submitBtn.style.display = 'none';
+                    prevBtn.classList.remove('ms-auto');
+                }
+
+                stepInput.value = step;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            function validateStep(step) {
+
+                // ======================
+                // VALIDASI STEP 1
+                // ======================
+                if (step === 1) {
+
+                    let errors = [];
+
+                    const photoInput = document.getElementById('photoInput');
+                    const fullName = document.querySelector('input[name="full_name"]')?.value.trim();
+                    const nik = document.querySelector('input[name="student_nik"]')?.value.trim();
+                    const birthPlace = document.querySelector('input[name="birth_place"]')?.value.trim();
+                    const birthDate = document.querySelector('input[name="birth_date"]')?.value;
+                    const address = document.querySelector('textarea[name="address"]')?.value.trim();
+                    const gender = document.querySelector('select[name="gender"]')?.value;
+                    const religion = document.querySelector('select[name="religion"]')?.value;
+                    const parentPhone = document.querySelector('input[name="parent_phone"]')?.value.trim();
+                    const childOrder = document.querySelector('input[name="child_order"]')?.value.trim();
+                    const totalSiblings = document.querySelector('input[name="total_siblings"]')?.value.trim();
+
+                    // Cek apakah sudah ada foto dari session (tampilan preview bukan default avatar)
+                    const photoPreview = document.getElementById('photoPreview');
+                    const hasExistingPhoto = photoPreview && photoPreview.src && !photoPreview.src.includes('ui-avatars');
+                    
+                    // VALIDASI SEMUA FIELD (WAJIB)
+                    if (photoInput.files.length === 0 && !hasExistingPhoto) {
+                        errors.push("Foto");
+                    }
+                    if (!fullName) errors.push("Nama lengkap");
+                    if (!nik) errors.push("NIK");
+                    if (!birthPlace) errors.push("Tempat lahir");
+                    if (!birthDate) errors.push("Tanggal lahir");
+                    if (!address) errors.push("Alamat");
+                    if (!gender) errors.push("Jenis kelamin");
+                    if (!religion) errors.push("Agama");
+                    if (!parentPhone) errors.push("No HP orang tua");
+                    if (!childOrder) errors.push("Anak ke-");
+                    if (!totalSiblings) errors.push("Jumlah saudara");
+
+                    if (errors.length > 0) {
+                        showErrorList(errors);
+                        return false;
+                    }
+                }
+
+                // ======================
+                // VALIDASI STEP 2
+                // ======================
+                if (step === 2) {
+
+                    const schoolName = document.querySelector('input[name="school_name"]')?.value.trim();
+                    const schoolClass = document.querySelector('input[name="school_class"]')?.value.trim();
+                    const schoolAddress = document.querySelector('input[name="school_address"]')?.value.trim();
+
+                    if (!schoolName) {
+                        showErrorModal('Nama sekolah wajib diisi!');
+                        return false;
+                    }
+
+                    if (!schoolClass) {
+                        showErrorModal('Kelas wajib diisi!');
+                        return false;
+                    }
+
+                    if (!schoolAddress) {
+                        showErrorModal('Alamat sekolah wajib diisi!');
+                        return false;
+                    }
+                }
+
+                // ======================
+                // VALIDASI STEP 3
+                // ======================
+                if (step === 3) {
+
+                    const fatherName = document.querySelector('input[name="father_name"]')?.value.trim();
+                    const fatherJob = document.querySelector('input[name="father_job"]')?.value.trim();
+                    const motherName = document.querySelector('input[name="mother_name"]')?.value.trim();
+                    const motherJob = document.querySelector('input[name="mother_job"]')?.value.trim();
+                    const parentAddress = document.querySelector('textarea[name="parent_address"]')?.value.trim();
+                    const guardianName = document.querySelector('input[name="guardian_name"]')?.value.trim();
+                    const guardianJob = document.querySelector('input[name="guardian_job"]')?.value.trim();
+                    const guardianAddress = document.querySelector('textarea[name="guardian_address"]')?.value.trim();
+
+                    if (!fatherName) {
+                        showErrorModal('Nama ayah wajib diisi!');
+                        return false;
+                    }
+
+                    if (!fatherJob) {
+                        showErrorModal('Pekerjaan ayah wajib diisi!');
+                        return false;
+                    }
+
+                    if (!motherName) {
+                        showErrorModal('Nama ibu wajib diisi!');
+                        return false;
+                    }
+
+                    if (!motherJob) {
+                        showErrorModal('Pekerjaan ibu wajib diisi!');
+                        return false;
+                    }
+
+                    if (!parentAddress) {
+                        showErrorModal('Alamat orang tua wajib diisi!');
+                        return false;
+                    }
+
+                    if (!guardianName) {
+                        showErrorModal('Nama wali wajib diisi!');
+                        return false;
+                    }
+
+                    if (!guardianJob) {
+                        showErrorModal('Pekerjaan wali wajib diisi!');
+                        return false;
+                    }
+
+                    if (!guardianAddress) {
+                        showErrorModal('Alamat wali wajib diisi!');
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            function showErrorList(errors) {
+                console.log("FIELD KOSONG:", errors);
+
+                const modalTitle = document.getElementById('confirmModalTitle');
+                const modalBody = document.getElementById('confirmModalBody');
+                const modalBtn = document.getElementById('confirmModalBtn');
+
+                modalTitle.innerHTML = 'Validasi Gagal';
+                modalBtn.className = 'btn btn-danger ms-1';
+
+                modalBody.innerHTML = `
+        <b>Beberapa field belum diisi:</b><br><br>
+        <ul style="text-align:left;">
+            ${errors.map(e => `<li>${e}</li>`).join('')}
+        </ul>
+    `;
+
+                const newBtn = modalBtn.cloneNode(true);
+                modalBtn.parentNode.replaceChild(newBtn, modalBtn);
+
+                newBtn.addEventListener('click', function () {
+                    bootstrap.Modal.getInstance(document.getElementById('confirmModal')).hide();
+                });
+
+                new bootstrap.Modal(document.getElementById('confirmModal')).show();
+            }
+
+            // Next button - SUBMIT ke server untuk menyimpan data
+            nextBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                if (!validateStep(currentStep)) return;
+
+                if (currentStep < 3) {
+                    // Submit form ke server
+                    stepInput.value = currentStep;
+                    form.submit();
                 }
             });
-        }
 
-        // Cancel button handler
-        const cancelBtn = document.getElementById('cancelBtn');
-        if (cancelBtn) {
-            cancelBtn.onclick = function (e) {
+            // Previous button - TIDAK SUBMIT, hanya navigasi lokal
+            prevBtn.addEventListener('click', function (e) {
                 e.preventDefault();
-                const modal = new bootstrap.Modal(document.getElementById('cancelModal'));
-                modal.show();
-            };
-        }
 
-        // Confirm cancel button - langsung redirect
-        const confirmCancelBtn = document.getElementById('confirmCancelBtn');
-        if (confirmCancelBtn) {
-            confirmCancelBtn.onclick = function () {
-                window.location.href = '/students/cancel-registration';
-            };
-        }
+                if (currentStep > 1) {
+                    currentStep--;
+                    updateStepUI(currentStep);
+                    history.pushState({}, '', '?step=' + currentStep);
+                }
+            });
 
-        updateStepUI(currentStep);
+            // Tombol Submit Final - dengan validasi + konfirmasi
+            if (submitBtn) {
+                submitBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    // VALIDASI STEP 3 DULU
+                    if (!validateStep(3)) {
+                        return;
+                    }
+
+                    // Kalau lolos validasi baru tampil konfirmasi
+                    showConfirmModal(
+                        'Apakah Anda yakin data yang diisi sudah benar?',
+                        function () {
+                            stepInput.value = 3;
+                            form.submit();
+                        }
+                    );
+                });
+            }
+
+            // Photo preview
+            const photoInput = document.getElementById('photoInput');
+            const photoPreview = document.getElementById('photoPreview');
+            const uploadPhotoBtn = document.getElementById('uploadPhotoBtn');
+
+            if (uploadPhotoBtn) {
+                uploadPhotoBtn.addEventListener('click', function () {
+                    photoInput.click();
+                });
+            }
+
+            if (photoInput) {
+                photoInput.addEventListener('change', function (e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            photoPreview.src = e.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+
+            // Cancel button handler
+            const cancelBtn = document.getElementById('cancelBtn');
+            if (cancelBtn) {
+                cancelBtn.onclick = function (e) {
+                    e.preventDefault();
+                    const modal = new bootstrap.Modal(document.getElementById('cancelModal'));
+                    modal.show();
+                };
+            }
+
+            // Confirm cancel button - langsung redirect
+            const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+            if (confirmCancelBtn) {
+                confirmCancelBtn.onclick = function () {
+                    window.location.href = '/students/cancel-registration';
+                };
+            }
+
+            // ==========================================
+            // AUTO SAVE FORM KE LOCAL STORAGE
+            // ==========================================
+
+            const STORAGE_KEY = 'student_registration_form';
+
+            function saveFormToLocalStorage() {
+
+                const formData = {};
+
+                document.querySelectorAll('#multiStepForm input, #multiStepForm textarea, #multiStepForm select')
+                    .forEach(field => {
+
+                        if (!field.name) return;
+                        formData[field.name] = field.value;
+                    });
+
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+            }
+
+            function loadFormFromLocalStorage() {
+
+                const savedData = localStorage.getItem(STORAGE_KEY);
+
+                if (!savedData) return;
+
+                const formData = JSON.parse(savedData);
+
+                Object.keys(formData).forEach(name => {
+
+                    const field = document.querySelector(`[name="${name}"]`);
+
+                    if (!field) return;
+
+                    // SKIP file input
+                    if (field.type === "file") return;
+
+                    if (formData[name] !== undefined && formData[name] !== "") {
+                        field.value = formData[name];
+                    }
+                });
+
+            }
+
+            document.querySelectorAll('#multiStepForm input, #multiStepForm textarea, #multiStepForm select')
+                .forEach(field => {
+
+                    field.addEventListener('input', saveFormToLocalStorage);
+                    field.addEventListener('change', saveFormToLocalStorage);
+                });
+
+            form.addEventListener('submit', function () {
+                localStorage.removeItem(STORAGE_KEY);
+            });
+
+            // LOAD LOCAL STORAGE TERLEBIH DAHULU
+            loadFormFromLocalStorage();
+
+            // PRIORITAS STEP (URL > STORAGE > DEFAULT)
+            if (stepFromUrl) {
+                const step = parseInt(stepFromUrl);
+
+                if (!isNaN(step) && step >= 1 && step <= 3) {
+                    currentStep = step;
+                } else {
+                    currentStep = 1;
+                }
+            }
+
+            // VALIDASI BOUNDARY
+            if (isNaN(currentStep)) currentStep = 1;
+            if (currentStep < 1) currentStep = 1;
+            if (currentStep > 3) currentStep = 3;
+
+            // UPDATE UI
+            updateStepUI(currentStep);
+
+        });
     </script>
 
     <!-- Modal Cancel -->

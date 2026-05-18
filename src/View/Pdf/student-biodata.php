@@ -1,5 +1,33 @@
 <?php
 
+// Fungsi format tanggal Indonesia
+function formatTglIndonesia($tanggal)
+{
+    if (empty($tanggal))
+        return '-';
+
+    $bulan = [
+        1 => 'Januari',
+        'Februari',
+        'Maret',
+        'April',
+        'Mei',
+        'Juni',
+        'Juli',
+        'Agustus',
+        'September',
+        'Oktober',
+        'November',
+        'Desember'
+    ];
+
+    $tgl = date('j', strtotime($tanggal));
+    $bln = (int) date('n', strtotime($tanggal));
+    $thn = date('Y', strtotime($tanggal));
+
+    return $tgl . ' ' . $bulan[$bln] . ' ' . $thn;
+}
+
 // KOP SURAT
 $kopPath = __DIR__ . '/../../../public/assets/images/kop.png';
 $kopType = pathinfo($kopPath, PATHINFO_EXTENSION);
@@ -117,7 +145,7 @@ if (!empty($student->img) && file_exists($photoPath)) {
                         <td>:</td>
                         <td>
                             <?= $student->birth_place ?>,
-                            <?= $student->birth_date ?>
+                            <?= formatTglIndonesia($student->birth_date) ?>
                         </td>
                     </tr>
 
@@ -287,7 +315,7 @@ if (!empty($student->img) && file_exists($photoPath)) {
 
     <div class="signature">
 
-        Cendoro, <?= date('d F Y') ?>
+        Cendoro, <?= formatTglIndonesia(date('Y-m-d')) ?>
 
         <br><br><br><br>
 

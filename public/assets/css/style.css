@@ -139,13 +139,14 @@ body {
 }
 
 /* Nonaktifkan penguncian scroll dari JS */
-body, html {
-    overflow: auto !important;
+body,
+html {
+  overflow: auto !important;
 }
 
 /* Sembunyikan preloader jika masih ada */
 .preloader {
-    display: none !important;
+  display: none !important;
 }
 
 body.loaded {
@@ -765,123 +766,130 @@ body.nav-active {
   margin-inline: auto;
 }
 
- /* Section Visi Misi */
-        .visimisi {
-            padding: 80px 0;
-        }
+/* Section Visi Misi */
+.visimisi {
+  padding: 80px 0;
+}
 
-        /* Layout Kiri-Kanan */
-        .visimisi-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            align-items: start;
-        }
+/* Layout Kiri-Kanan */
+.visimisi-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
 
-        /* Kartu Visi & Misi */
-        .visi-card, .misi-card {
-            background: white;
-            padding: 40px 30px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            border: 1px solid #eef2ee;
-            transition: transform 0.3s ease;
-            height: 100%;
-        }
+/* Kartu Visi & Misi */
+.visi-card,
+.misi-card {
+  background: white;
+  padding: 40px 30px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  border: 1px solid #eef2ee;
+  transition: transform 0.3s ease;
+  height: 100%;
+}
 
-        .visi-card:hover, .misi-card:hover {
-            transform: translateY(-5px);
-        }
+.visi-card:hover,
+.misi-card:hover {
+  transform: translateY(-5px);
+}
 
-        .card-title {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 25px;
-            position: relative;
-            display: inline-block;
-        }
+.card-title {
+  font-size: 28px;
+  font-weight: 700;
+  margin-bottom: 25px;
+  position: relative;
+  display: inline-block;
+}
 
-        .visi-card .card-title {
-            color: #0d9488;
-        }
+.visi-card .card-title {
+  color: #0d9488;
+}
 
-        .misi-card .card-title {
-            color: #0d9488;
-        }
+.misi-card .card-title {
+  color: #0d9488;
+}
 
-        .card-title::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 0;
-            width: 60px;
-            height: 3px;
-            background: #0d9488;
-            border-radius: 2px;
-        }
+.card-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: #0d9488;
+  border-radius: 2px;
+}
 
-        /* Teks Visi */
-        .visi-text {
-            color: #4a4a4a;
-            line-height: 1.8;
-            text-align: justify;
-            font-size: 16px;
-        }
+/* Teks Visi */
+.visi-text {
+  color: #4a4a4a;
+  line-height: 1.8;
+  text-align: justify;
+  font-size: 16px;
+}
 
-        /* List Misi */
-        .misi-list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
+/* List Misi */
+.misi-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
 
-        .misi-list li {
-            display: flex;
-            gap: 15px;
-            align-items: flex-start;
-        }
+.misi-list li {
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+}
 
-        .misi-number {
-            background-color: #e6f4f2;
-            color: #0d9488;
-            font-weight: 700;
-            min-width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            font-size: 13px;
-            flex-shrink: 0;
-            margin-top: 3px;
-        }
+.misi-number {
+  background-color: #e6f4f2;
+  color: #0d9488;
+  font-weight: 700;
+  min-width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 13px;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
 
-        .misi-text {
-            color: #4a4a4a;
-            line-height: 1.7;
-            font-size: 15px;
-        }
+.misi-text {
+  color: #4a4a4a;
+  line-height: 1.7;
+  font-size: 15px;
+}
 
-        /* Responsive Mobile */
-        @media (max-width: 768px) {
-            .visimisi {
-                padding: 50px 0;
-            }
-            .section-title {
-                font-size: 24px;
-            }
-            .visimisi-grid {
-                grid-template-columns: 1fr;
-                gap: 25px;
-            }
-            .visi-card, .misi-card {
-                padding: 30px 20px;
-            }
-            .card-title {
-                font-size: 24px;
-            }
-        }
+/* Responsive Mobile */
+@media (max-width: 768px) {
+  .visimisi {
+    padding: 50px 0;
+  }
+
+  .section-title {
+    font-size: 24px;
+  }
+
+  .visimisi-grid {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+
+  .visi-card,
+  .misi-card {
+    padding: 30px 20px;
+  }
+
+  .card-title {
+    font-size: 24px;
+  }
+}
 
 
 
@@ -931,7 +939,54 @@ body.nav-active {
 }
 
 
+a {
+  text-decoration: none;
+}
 
+.floating_btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+@keyframes pulsing {
+  to {
+    box-shadow: 0 0 0 30px rgba(232, 76, 61, 0);
+  }
+}
+
+.contact_icon {
+  background-color: #42db87;
+  color: #fff;
+  width: 60px;
+  height: 60px;
+  font-size: 30px;
+  border-radius: 50px;
+  text-align: center;
+  box-shadow: 2px 2px 3px #999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translatey(0px);
+  animation: pulse 1.5s infinite;
+  box-shadow: 0 0 0 0 #42db87;
+  -webkit-animation: pulsing 1.25s infinite cubic-bezier(0.66, 0, 0, 1);
+  animation: pulsing 1.25s infinite cubic-bezier(0.66, 0, 0, 1);
+  transition: all 300ms ease-in-out;
+}
+
+.text_icon {
+  margin-top: 8px;
+  color: #707070;
+  font-size: 13px;
+}
 
 
 /*-----------------------------------*\
@@ -1081,9 +1136,9 @@ body.nav-active {
 
     --section-padding: 120px;
 
-     .section.about .container {
-    display: block !important;
-  }
+    .section.about .container {
+      display: block !important;
+    }
 
   }
 
@@ -1275,38 +1330,42 @@ body.nav-active {
 
 /* 1. Hapus overflow hidden dari body */
 body {
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-    width: 100%;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  width: 100%;
 }
 
 /* 2. Paksa html dan body tidak kelebihan */
-html, body {
-    max-width: 100%;
-    overflow-x: hidden !important;
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden !important;
 }
 
 /* 3. Semua konten tidak boleh melebihi lebar layar */
 * {
-    max-width: 100%;
+  max-width: 100%;
 }
 
 /* 4. Perbaiki hero banner yang pakai margin negatif */
 .hero-banner {
-    margin-inline-end: 0 !important;
+  margin-inline-end: 0 !important;
 }
 
 /* 5. Container harus full width */
 .container {
-    max-width: 1170px;
-    width: 100%;
-    margin-inline: auto;
-    padding-inline: 16px;
-    overflow-x: hidden;
+  max-width: 1170px;
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: 16px;
+  overflow-x: hidden;
 }
 
 /* 6. Pastikan gambar tidak kelebaran */
-img, iframe, video, figure {
-    max-width: 100%;
-    height: auto;
+img,
+iframe,
+video,
+figure {
+  max-width: 100%;
+  height: auto;
 }

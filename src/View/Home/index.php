@@ -33,6 +33,10 @@
   -->
     <link rel="stylesheet" href="/assets/css/style.css">
 
+    <!-- FONT AWESOME -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+
+
     <!-- 
     - preload images
   -->
@@ -119,7 +123,7 @@
                     <li class="navbar-item mobile-only">
                         <a href="/students/registration-multi" class="navbar-link title-sm" data-nav-link>
 
-                            Daftar
+                            Daftar PSB
 
                         </a>
                     </li>
@@ -171,14 +175,14 @@
 
                             <p class="title-md has-before">
                                 Selamat Datang di Madrasah Diniyah Takmiliyah Awwaliyah (MDTA) "Lam'atun Nur" Cendoro –
-                                Palang – Tuban.<br> PENDAFTARAN SANTRI BARU (PSB) TAHUN PELAJARAN 2026/2027 Mari daftar
+                                Palang – Tuban.<br> Pendaftaran santri baru (PSB) tahun Pelajaran 2026/2027 Mari daftar
                                 sekarang
                             </p>
 
                             <div class="btn-group">
-                                <a href="/users/login" class="btn btn-primary">Login Sistem</a>
+                                <a href="/users/login" class="btn btn-primary">Login</a>
 
-                                <a href="/students/registration-multi" class="btn btn-secondary">Daftar Siswa</a>
+                                <a href="/students/registration-multi" class="btn btn-secondary">Daftar PSB</a>
                             </div>
 
                     </div>
@@ -196,7 +200,7 @@
 - #ABOUT
 -->
 
-            <section class="section about has-bg-image" aria-labelledby="about-label"
+            <!-- <section class="section about has-bg-image" aria-labelledby="about-label"
                 style="background-image: url('./assets/images/category-bg.png')">
 
                 <div class="container">
@@ -212,13 +216,11 @@
                             <span class="span has-after">Lam’atun Nur</span>
                         </h2>
 
-                        <!-- Gambar -->
                         <figure class="about-banner">
                             <img src="./assets/images/about-banner.png" width="775" height="685" loading="lazy"
                                 alt="about banner" class="w-100">
                         </figure>
 
-                        <!-- Isi sejarah -->
                         <p class="title-sm section-text">
                             Berdirinya Madrasah Diniyah ini dilatarbelakangi oleh semangat dan
                             inisiatif para tokoh agama dan masyarakat, khususnya K. M. Anwar
@@ -270,16 +272,15 @@
 
                 </div>
 
-            </section>
+            </section> -->
 
 
             <!-- 
         - #CTA
       -->
 
-            <section class="visimisi" style="background-color: var(--keppei);">
+            <!-- <section class="visimisi" style="background-color: var(--keppei);">
                 <div class="container">
-                    <!-- Judul di atas -->
                     <div style="text-align: center;">
 
                         <p class="section-title" style="
@@ -301,9 +302,7 @@
                         Madrasah Diniyah<span class="span has-after"> Lam'atun Nur</span>
                     </h2>
 
-                    <!-- Layout Kiri: Visi, Kanan: Misi -->
                     <div class="visimisi-grid">
-                        <!-- VISI (Kiri) -->
                         <div class="visi-card">
                             <h3 class="card-title">Visi</h3>
                             <p class="visi-text">
@@ -313,7 +312,6 @@
                             </p>
                         </div>
 
-                        <!-- MISI (Kanan) -->
                         <div class="misi-card">
                             <h3 class="card-title">Misi</h3>
                             <ul class="misi-list">
@@ -341,7 +339,7 @@
                         </div>
                     </div>
                 </div>
-            </section>
+            </section> -->
 
 
         </article>
@@ -357,10 +355,9 @@
 
     <footer class="footer has-bg-image" style="background-image: url('./assets/images/footer-bg.png')">
 
-        <div class="section footer-top">
+        <!-- <div class="section footer-top">
             <div class="container">
 
-                <!-- Brand -->
                 <div class="footer-brand">
 
                     <a href="#" class="logo">
@@ -376,9 +373,8 @@
 
                     <ul class="social-list">
 
-                        <!-- WhatsApp -->
                         <li>
-                            <a href="https://wa.me/6281336115729" target="_blank" class="social-link">
+                            <a href="https://wa.me/6282125220221" target="_blank" class="social-link">
 
                                 <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" width="40" height="40"
                                     loading="lazy" alt="WhatsApp">
@@ -386,7 +382,6 @@
                             </a>
                         </li>
 
-                        <!-- Google Maps -->
                         <li>
                             <a href="https://www.google.com/maps/search/?api=1&query=Desa+Cendoro+Kecamatan+Palang+Kabupaten+Tuban"
                                 target="_blank" class="social-link">
@@ -401,8 +396,7 @@
 
                 </div>
 
-                <!-- Menu -->
-                <!-- <ul class="footer-list">
+                <ul class="footer-list">
 
                     <li>
                         <p class="headline-sm footer-list-title">
@@ -440,9 +434,8 @@
                         </a>
                     </li>
 
-                </ul> -->
+                </ul>
 
-                <!-- Informasi -->
                 <ul class="footer-list">
 
                     <li>
@@ -477,7 +470,6 @@
 
                 </ul>
 
-                <!-- Kontak -->
                 <ul class="footer-list">
 
                     <li>
@@ -494,7 +486,7 @@
                     </li>
 
                     <li>
-                        <a href="https://wa.me/6281336115729" target="_blank" class="title-sm footer-link">
+                        <a href="https://wa.me/6282125220221" target="_blank" class="title-sm footer-link">
 
                             WhatsApp:
                             +62 813-3611-5729
@@ -534,15 +526,14 @@
                 </ul>
 
             </div>
-        </div>
+        </div> -->
 
         <!-- Bottom -->
         <div class="footer-bottom">
             <div class="container">
 
                 <p class="copyright">
-                    © 2026 MADRASAH DINIYAH TAKMILIYAH AWWALIYAH (MDTA)
-                    LAM’ATUN NUR — All Rights Reserved.
+                    © 2026 Firda Chalim
                 </p>
 
             </div>
@@ -561,6 +552,16 @@
   -->
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+    <!-- HTML FLOATING BUTTON -->
+    <div class="floating_btn">
+        <a target="_blank" href="https://wa.me/6282125220221">
+            <div class="contact_icon">
+                <i class="fa fa-whatsapp my-float"></i>
+            </div>
+        </a>
+        <p class="text_icon">Butuh Bantuan?</p>
+    </div>
 
 </body>
 

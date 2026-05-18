@@ -83,27 +83,83 @@ class StudentRegistrationService
 
     public function validationStudentRegistrationRequest(StudentRegistrationRequest $request): void
     {
-        if (
-            $request->full_name == null ||
-            $request->birth_place == null ||
-            $request->birth_date == null ||
-            $request->student_nik == null ||
-            $request->address == null ||
-            $request->gender == null ||
-            $request->religion == null ||
-            // HAPUS parent_phone dari validasi wajib
-            // $request->parent_phone == null ||
+        $errors = [];
 
-            trim($request->full_name) == "" ||
-            trim($request->birth_place) == "" ||
-            trim($request->birth_date) == "" ||
-            trim($request->student_nik) == "" ||
-            trim($request->address) == "" ||
-            trim($request->gender) == "" ||
-            trim($request->religion) == ""
-            // trim($request->parent_phone) == ""
-        ) {
-            throw new ValidationException("Required fields can not blank");
+        // STEP 1 - Data Pribadi (WAJIB SEMUA)
+        if (empty(trim($request->full_name ?? ''))) {
+            $errors[] = "Nama lengkap tidak boleh kosong";
+        }
+        if (empty(trim($request->birth_place ?? ''))) {
+            $errors[] = "Tempat lahir tidak boleh kosong";
+        }
+        if (empty(trim($request->birth_date ?? ''))) {
+            $errors[] = "Tanggal lahir tidak boleh kosong";
+        }
+        if (empty(trim($request->student_nik ?? ''))) {
+            $errors[] = "NIK tidak boleh kosong";
+        }
+        if (empty(trim($request->address ?? ''))) {
+            $errors[] = "Alamat tidak boleh kosong";
+        }
+        if (empty(trim($request->gender ?? ''))) {
+            $errors[] = "Jenis kelamin tidak boleh kosong";
+        }
+        if (empty(trim($request->religion ?? ''))) {
+            $errors[] = "Agama tidak boleh kosong";
+        }
+        if (empty(trim($request->parent_phone ?? ''))) {
+            $errors[] = "No HP Orang Tua tidak boleh kosong";
+        }
+
+        // child_order dan total_siblings bisa 0, jadi validasi berbeda
+        if (!isset($request->child_order) || $request->child_order === '' || $request->child_order === null) {
+            $errors[] = "Anak ke- tidak boleh kosong";
+        }
+        if (!isset($request->total_siblings) || $request->total_siblings === '' || $request->total_siblings === null) {
+            $errors[] = "Jumlah saudara tidak boleh kosong";
+        }
+
+        // STEP 2 - Data Sekolah (WAJIB)
+        if (empty(trim($request->school_name ?? ''))) {
+            $errors[] = "Nama sekolah tidak boleh kosong";
+        }
+        if (empty(trim($request->school_class ?? ''))) {
+            $errors[] = "Kelas tidak boleh kosong";
+        }
+        if (empty(trim($request->school_address ?? ''))) {
+            $errors[] = "Alamat sekolah tidak boleh kosong";
+        }
+
+        // STEP 3 - Data Orang Tua (WAJIB)
+        if (empty(trim($request->father_name ?? ''))) {
+            $errors[] = "Nama ayah tidak boleh kosong";
+        }
+        if (empty(trim($request->father_job ?? ''))) {
+            $errors[] = "Pekerjaan ayah tidak boleh kosong";
+        }
+        if (empty(trim($request->mother_name ?? ''))) {
+            $errors[] = "Nama ibu tidak boleh kosong";
+        }
+        if (empty(trim($request->mother_job ?? ''))) {
+            $errors[] = "Pekerjaan ibu tidak boleh kosong";
+        }
+        if (empty(trim($request->parent_address ?? ''))) {
+            $errors[] = "Alamat orang tua tidak boleh kosong";
+        }
+
+        // STEP 3 - Data Wali (WAJIB)
+        if (empty(trim($request->guardian_name ?? ''))) {
+            $errors[] = "Nama wali tidak boleh kosong";
+        }
+        if (empty(trim($request->guardian_job ?? ''))) {
+            $errors[] = "Pekerjaan wali tidak boleh kosong";
+        }
+        if (empty(trim($request->guardian_address ?? ''))) {
+            $errors[] = "Alamat wali tidak boleh kosong";
+        }
+
+        if (!empty($errors)) {
+            throw new ValidationException(implode(", ", $errors));
         }
     }
 
