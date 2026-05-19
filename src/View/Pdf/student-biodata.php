@@ -1,31 +1,35 @@
 <?php
 
 // Fungsi format tanggal Indonesia
-function formatTglIndonesia($tanggal)
-{
-    if (empty($tanggal))
-        return '-';
+if (!function_exists('formatTglIndonesia')) {
 
-    $bulan = [
-        1 => 'Januari',
-        'Februari',
-        'Maret',
-        'April',
-        'Mei',
-        'Juni',
-        'Juli',
-        'Agustus',
-        'September',
-        'Oktober',
-        'November',
-        'Desember'
-    ];
+    function formatTglIndonesia($tanggal)
+    {
+        if (empty($tanggal))
+            return '-';
 
-    $tgl = date('j', strtotime($tanggal));
-    $bln = (int) date('n', strtotime($tanggal));
-    $thn = date('Y', strtotime($tanggal));
+        $bulan = [
+            1 => 'Januari',
+            'Februari',
+            'Maret',
+            'April',
+            'Mei',
+            'Juni',
+            'Juli',
+            'Agustus',
+            'September',
+            'Oktober',
+            'November',
+            'Desember'
+        ];
 
-    return $tgl . ' ' . $bulan[$bln] . ' ' . $thn;
+        $tgl = date('j', strtotime($tanggal));
+        $bln = (int) date('n', strtotime($tanggal));
+        $thn = date('Y', strtotime($tanggal));
+
+        return $tgl . ' ' . $bulan[$bln] . ' ' . $thn;
+    }
+
 }
 
 // KOP SURAT
@@ -66,6 +70,7 @@ if (!empty($student->img) && file_exists($photoPath)) {
         .kop {
             width: 100%;
             height: auto;
+            margin-top: 20px;
             margin-bottom: 5px;
         }
 

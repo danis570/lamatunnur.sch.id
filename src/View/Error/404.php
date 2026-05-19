@@ -17,8 +17,8 @@
 
     <link rel="manifest" href="/favicon/site.webmanifest">
 
-    <link rel="stylesheet" crossorigin href="./assets/compiled/css/app.css">
-  <link rel="stylesheet" crossorigin href="./assets/compiled/css/error.css">
+    <link rel="stylesheet" crossorigin href="/assets/compiled/css/app.css">
+  <link rel="stylesheet" crossorigin href="/assets/compiled/css/error.css">
 </head>
 
 <body>
@@ -29,7 +29,7 @@
 <div class="error-page container">
     <div class="col-md-8 col-12 offset-md-2">
         <div class="text-center">
-            <img class="img-error" src="./assets/compiled/svg/error-404.svg" alt="Not Found">
+            <img class="img-error" src="/assets/compiled/svg/error-404.svg" alt="Not Found">
             <h1 class="error-title">Not Found</h1>
             <p class='fs-5 text-gray-600'>The page you are looking not found.</p>
             <a href="/" class="btn btn-lg btn-outline-primary mt-3">Go Home</a>

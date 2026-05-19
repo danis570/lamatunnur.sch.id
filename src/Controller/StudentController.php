@@ -357,30 +357,30 @@ class StudentController
     }
 
     public function data()
-{
-    // Pastikan session aktif
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
+    {
+        // Pastikan session aktif
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        $allStudents = $this->studentRegistrationService->findAll();
+
+        // Ambil dari session
+        $currentUser = $_SESSION['user'] ?? null;
+        $userRole = $currentUser['role'] ?? 'guest';
+
+        // DEBUG
+        error_log("=== DATA CONTROLLER ===");
+        error_log("Session user: " . print_r($_SESSION['user'], true));
+        error_log("User Role: " . $userRole);
+
+        View::render('Student/data', [
+            'title' => 'Student Data',
+            'students' => $allStudents,
+            'user' => $currentUser,
+            'userRole' => $userRole  // WAJIB dikirim
+        ]);
     }
-    
-    $allStudents = $this->studentRegistrationService->findAll();
-    
-    // Ambil dari session
-    $currentUser = $_SESSION['user'] ?? null;
-    $userRole = $currentUser['role'] ?? 'guest';
-    
-    // DEBUG
-    error_log("=== DATA CONTROLLER ===");
-    error_log("Session user: " . print_r($_SESSION['user'], true));
-    error_log("User Role: " . $userRole);
-    
-    View::render('Student/data', [
-        'title' => 'Student Data',
-        'students' => $allStudents,
-        'user' => $currentUser,
-        'userRole' => $userRole  // WAJIB dikirim
-    ]);
-}
 
     public function edit(int $id)
     {
@@ -593,7 +593,7 @@ class StudentController
         $dompdf->stream(
             'biodata-santri.pdf',
             [
-                'Attachment' => false
+                'Attachment' => true
             ]
         );
     }
@@ -642,12 +642,20 @@ class StudentController
 
         $dompdf->render();
 
+
+        // PENTING
+        while (ob_get_level()) {
+            ob_end_clean();
+        }
+
         $dompdf->stream(
             'biodata-santri.pdf',
             [
-                'Attachment' => false
+                'Attachment' => true
             ]
         );
+
+        exit;
     }
 
     public function exportExcelMultiple()
