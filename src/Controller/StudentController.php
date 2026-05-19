@@ -53,7 +53,7 @@ class StudentController
         unset($_SESSION['registration_error']);
 
         View::render('Student/registration_multi', [
-            'title' => 'Multi Step Registration',
+            'title' => 'Pendaftaran Santri baru',
             'currentStep' => $currentStep,
             'formData' => $formData,
             'error' => $error
@@ -249,9 +249,35 @@ class StudentController
             $_SESSION['registration_error'] = $e->getMessage();
             header("Location: /students/registration-multi?step=3");
             exit;
+        } catch (\PDOException $e) {
+
+            error_log("PDO Error: " . $e->getMessage());
+
+            // Duplicate NIK
+            if (
+                str_contains($e->getMessage(), 'student_nik') ||
+                str_contains($e->getMessage(), 'Duplicate entry')
+            ) {
+
+                $_SESSION['registration_error'] =
+                    "NIK santri sudah terdaftar. Silakan periksa lagi atau hubungi admin jika merasa sudah benar.";
+            } else {
+
+                $_SESSION['registration_error'] =
+                    "Terjadi kesalahan pada sistem. Silakan coba lagi.";
+
+            }
+
+            header("Location: /students/registration-multi?step=3");
+            exit;
+
         } catch (\Exception $e) {
+
             error_log("General error: " . $e->getMessage());
-            $_SESSION['registration_error'] = "Terjadi kesalahan: " . $e->getMessage();
+
+            $_SESSION['registration_error'] =
+                "Terjadi kesalahan. Silakan coba beberapa saat lagi.";
+
             header("Location: /students/registration-multi?step=3");
             exit;
         }

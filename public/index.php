@@ -23,12 +23,12 @@ Router::add("GET", "/users/logout", UserController::class, "logout", [MustLoginM
 Router::add("POST", "/users/logout", UserController::class, "logout", [MustLoginMiddleware::class]);
 
 // user role admin controller
-Router::add('GET', '/students/data', StudentController::class, 'data');
-Router::add('GET', '/students/edit/([0-9]+)', StudentController::class, 'edit');
-Router::add('GET', '/students/show/([0-9]+)', StudentController::class, 'show');
-Router::add('POST', '/students/update', StudentController::class, 'update');
-Router::add('POST', '/students/delete', StudentController::class, 'delete');
-Router::add('POST', '/students/delete-multiple', StudentController::class, 'deleteMultiple');
+Router::add('GET', '/students/data', StudentController::class, 'data', [MustLoginMiddleware::class]);
+Router::add('GET', '/students/edit/([0-9]+)', StudentController::class, 'edit', [MustLoginMiddleware::class]);
+Router::add('GET', '/students/show/([0-9]+)', StudentController::class, 'show', [MustLoginMiddleware::class]);
+Router::add('POST', '/students/update', StudentController::class, 'update', [MustLoginMiddleware::class]);
+Router::add('POST', '/students/delete', StudentController::class, 'delete', [MustLoginMiddleware::class]);
+Router::add('POST', '/students/delete-multiple', StudentController::class, 'deleteMultiple', [MustLoginMiddleware::class]);
 
 // Route untuk PDF yang bisa diakses tanpa login
 Router::add("GET", "/students/export/pdf/([0-9]+)", StudentController::class, "exportPdf", []);
@@ -46,7 +46,7 @@ Router::add("POST", "/students/export/excel-multiple", StudentController::class,
 Router::add("POST", "/students/accept-multiple", StudentController::class, "acceptMultiple", [MustAdminMiddleware::class]);
 
 // Single step registration (old)
-Router::add("GET", "/students/registration", StudentController::class, "registration", []);
-Router::add("POST", "/students/registration", StudentController::class, "postRegistration", []);
+// Router::add("GET", "/students/registration", StudentController::class, "registration", []);
+// Router::add("POST", "/students/registration", StudentController::class, "postRegistration", []);
 
 Router::run();

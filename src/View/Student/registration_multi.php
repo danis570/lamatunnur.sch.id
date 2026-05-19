@@ -1,32 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registrasi tahun Ajaran 2026/2027</title>
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="/favicon/favicon.ico">
-
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon/favicon-32x32.png">
-
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon/favicon-16x16.png">
-
-    <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png">
-
-    <link rel="manifest" href="/favicon/site.webmanifest">
-    
-
-    <link rel="stylesheet" href="/assets/compiled/css/app.css">
-    <link rel="stylesheet" href="/assets/compiled/css/app-dark.css">
-    <link rel="stylesheet" href="/assets/compiled/css/iconly.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-
-</head>
-
-<body>
-    <script src="/assets/static/js/initTheme.js"></script>
 
     <div>
 
@@ -363,12 +334,6 @@
         </div>
     </div>
 
-
-    <script src="/assets/static/js/components/dark.js"></script>
-    <script src="/assets/extensions/perfect-scrollbar/perfect-scrollbar.min.js"></script>
-    <script src="/assets/compiled/js/app.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
     <style>
         .step-indicator {
             display: flex;
@@ -466,6 +431,10 @@
         .btn-primary:hover {
             background-color: #3652a1;
             border-color: #3652a1;
+        }
+
+        .btn i {
+            line-height: 1;
         }
 
         .container {
@@ -980,6 +949,3 @@
             </div>
         </div>
     </div>
-</body>
-
-</html>

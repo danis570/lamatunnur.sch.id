@@ -10,7 +10,7 @@ class View
         $fileName = basename($view);
 
         // Hardcode: Sebutkan nama-nama file yang dilarang meload header & footer
-        $ignoredFiles = ['index','data', 'dashboard', 'edit', 'show'];
+        $ignoredFiles = ['index', 'dashboard', 'student-biodata', 'student-multiple', 'data', 'edit', 'show'];
 
         // Jika nama file TIDAK ada di dalam daftar coret, maka load header
         if (!in_array($fileName, $ignoredFiles)) {
